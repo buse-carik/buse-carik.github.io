@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buse Çarık</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="light"] {
+  --bg:         #ffffff;
+  --bg2:        #f4f2fc;
+  --bg3:        #ebe8fa;
+  --surface:    #ffffff;
+  --text:       #17151e;
+  --text2:      #4e45b0;
+  --text3:      #68647c;
+  --accent:     #4e45b0;
+  --accent-dim: #eeebfc;
+  --accent-mid: #a9a3e8;
+  --border:     rgba(78,69,176,0.10);
+  --border2:    rgba(78,69,176,0.18);
+  --shadow:     0 2px 8px rgba(78,69,176,0.08);
+}
+:root[data-theme="dark"] {
+  --bg:         #111110;
+  --bg2:        #1b1917;
+  --bg3:        #222120;
+  --surface:    #171614;
+  --text:       #e6e2d8;
+  --text2:      #3ab88b;
+  --text3:      #8a8780;
+  --accent:     #1d9e75;
+  --accent-dim: #0d2318;
+  --accent-mid: #0f6e56;
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(255,255,255,0.13);
+  --shadow:     0 2px 8px rgba(0,0,0,0.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.65;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 48px;
+  height: 58px;
+  background: var(--bg);
+  border-bottom: 0.5px solid var(--border);
+  transition: background 0.3s;
+}
+
+.nav-logo {
+  font-family: 'Lora', serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  letter-spacing: -0.01em;
+}
+
+.nav-right { display: flex; align-items: center; gap: 32px; }
+
+.nav-links { display: flex; gap: 28px; }
+
+.nav-link {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text3);
+  cursor: pointer;
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1.5px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.theme-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text2);
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+.theme-btn:hover { background: var(--bg2); color: var(--accent); }
+[data-theme="dark"] .theme-btn .icon-sun { display: none; }
+[data-theme="light"] .theme-btn .icon-moon { display: none; }
+
+/* ── PAGES ── */
+.page { display: none; max-width: 980px; margin: 0 auto; padding: 0 32px 56px; }
+.page.active { display: block; }
+
+/* ── HOME PAGE ── */
+.hero {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 64px;
+  align-items: start;
+  padding: 40px 0 28px;
+  margin-bottom: 24px;
+}
+
+.photo-wrap { position: relative; display: flex; flex-direction: column; align-items: center; }
+
+.photo-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  justify-content: center;
+  max-width: 200px;
+}
+.photo-link {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3);
+  background: var(--bg);
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.photo-link:hover { color: var(--accent); background: var(--accent-dim); border-color: var(--accent); }
+.photo-link-text {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.photo {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  border: 3px solid var(--surface);
+  outline: 0.5px solid var(--border2);
+  display: block;
+  background: var(--bg2);
+}
+.photo-placeholder {
+  width: 188px;
+  height: 188px;
+  border-radius: 50%;
+  background: var(--bg2);
+  outline: 0.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text3);
+  text-align: center;
+  padding: 16px;
+  line-height: 1.5;
+}
+
+.greeting {
+  font-family: 'Lora', serif;
+  font-size: 46px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin-bottom: 10px;
+  letter-spacing: -0.025em;
+}
+.greeting em { font-style: italic; color: var(--accent); }
+
+.tagline {
+  font-size: 14.5px;
+  color: var(--text3);
+  margin-bottom: 14px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.bio {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text3);
+  margin-bottom: 10px;
+  max-width: 100%;
+}
+.bio-note {
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+.bio a { color: var(--accent); text-decoration: none; }
+.bio a:hover { text-decoration: underline; }
+
+
+/* ── SECTION ── */
+.section { margin-bottom: 52px; }
+
+.sec-label {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.sec-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* NEWS */
+.news-list { display: flex; flex-direction: column; gap: 8px; }
+.news-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border);
+  background: var(--surface);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.news-row:hover { border-color: var(--accent-mid); box-shadow: var(--shadow); }
+.news-date {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+.news-text { font-size: 14.5px; color: var(--text); line-height: 1.6; }
+.news-text b { color: var(--text); font-weight: 600; }
+.news-text a { color: var(--accent); text-decoration: none; }
+
+/* PUBS */
+.pub-list { display: flex; flex-direction: column; }
+.pub-item {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 0.5px solid var(--border);
+  align-items: start;
+}
+.pub-item:first-child { border-top: none; }
+
+.pub-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pub-thumb {
+  width: 112px;
+  height: 80px;
+  border-radius: 7px;
+  object-fit: cover;
+  border: 0.5px solid var(--border);
+  display: block;
+}
+.pub-thumb-placeholder {
+  width: 112px;
+  height: 80px;
+  border-radius: 7px;
+  background: var(--bg2);
+  border: 1px dashed var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.venue-badge {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 4px 8px;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 1.4;
+  white-space: nowrap;
+  margin-top: 2px;
+  display: inline-block;
+}
+
+.pub-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.45;
+  margin-bottom: 4px;
+}
+.pub-title a { color: var(--text); text-decoration: none; }
+.pub-title a:hover { color: var(--accent); }
+.pub-authors { font-size: 13.5px; color: var(--text3); line-height: 1.5; }
+.pub-authors b { color: var(--accent); font-weight: 500; }
+.pub-links { margin-top: 6px; display: flex; gap: 8px; }
+.pub-link {
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  border: 0.5px solid var(--border2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.pub-link:hover { background: var(--accent-dim); }
+
+.more-link {
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 16px;
+}
+.more-link:hover { text-decoration: underline; }
+
+/* ── RESEARCH PAGE ── */
+.page-title {
+  font-family: 'Lora', serif;
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--text);
+  margin: 52px 0 8px;
+  letter-spacing: -0.02em;
+}
+.page-subtitle { font-size: 14px; color: var(--text3); margin-bottom: 44px; line-height: 1.7; }
+
+.research-card {
+  border: 0.5px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  padding: 28px 28px 24px;
+  margin-bottom: 20px;
+  background: var(--surface);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.research-card:hover { border-color: var(--border2); border-left-color: var(--accent); box-shadow: 0 4px 16px rgba(83,74,183,0.1); }
+
+.research-tag {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 3px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.research-title {
+  font-family: 'Lora', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.35;
+}
+.research-desc { font-size: 13.5px; color: var(--text3); line-height: 1.8; }
+.research-meta {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.research-meta-item { font-size: 12px; color: var(--text3); }
+.research-meta-item span { color: var(--text); font-weight: 500; }
+
+/* ── PUBLICATIONS PAGE ── */
+.year-group { margin-bottom: 36px; }
+.year-label {
+  font-family: 'Lora', serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+/* ── CV PAGE ── */
+.cv-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--accent);
+  border: 0.5px solid var(--border2);
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  margin-bottom: 48px;
+  transition: background 0.2s;
+}
+.cv-download:hover { background: var(--accent-dim); }
+
+.cv-section { margin-bottom: 44px; }
+.cv-section-title {
+  font-family: 'Lora', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 18px;
+  padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--border);
+}
+.cv-item { margin-bottom: 18px; }
+.cv-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3px;
+  gap: 16px;
+}
+.cv-item-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.cv-item-date { font-size: 12px; color: var(--text3); white-space: nowrap; flex-shrink: 0; }
+.cv-item-sub { font-size: 13px; color: var(--text3); }
+.cv-item-detail { font-size: 12.5px; color: var(--text3); margin-top: 3px; line-height: 1.6; }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px 32px;
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.footer-text { font-size: 12px; color: var(--text3); }
+.footer-text a { color: var(--accent); text-decoration: none; }
+
+/* ── PAPER KEYWORDS ── */
+.pub-keywords { display: flex; flex-wrap: wrap; gap: 4px; margin: 5px 0 4px; }
+.pub-kw {
+  font-size: 10.5px;
+  color: var(--text3);
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+/* ── RESEARCH INTEREST TAGS ── */
+.tags-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+.interest-tag {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+  background: var(--bg2);
+  color: var(--text2);
+  border: 1px solid var(--border2);
+  transition: background 0.2s, transform 0.15s;
+  cursor: default;
+  user-select: none;
+}
+.interest-tag:hover { background: var(--accent-dim); transform: translateY(-1px); }
+
+/* ── TALKS ── */
+.talk-list { display: flex; flex-direction: column; gap: 2px; }
+.talk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  transition: background 0.18s;
+}
+.talk-item:hover { background: var(--bg2); }
+.talk-icon { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+.talk-title { font-size: 13.5px; color: var(--text); font-weight: 500; line-height: 1.45; margin-bottom: 3px; }
+.talk-meta { font-size: 12px; color: var(--text3); }
+
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page.active { animation: fadeUp 0.3s ease; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  nav { padding: 0 20px; }
+  .page { padding: 0 20px 60px; }
+  .hero { grid-template-columns: 1fr; gap: 24px; padding: 36px 0 36px; }
+  .greeting { font-size: 28px; }
+  .photo-placeholder, .photo { width: 110px; height: 110px; }
+  footer { flex-direction: column; align-items: flex-start; gap: 6px; padding: 24px 20px; }
+  .pub-item { grid-template-columns: 1fr; gap: 10px; }
+  .pub-left { flex-direction: row; align-items: center; gap: 12px; }
+  .pub-thumb, .pub-thumb-placeholder { width: 80px; height: 58px; }
+  .news-row { grid-template-columns: 1fr; gap: 2px; }
+  .contact-row { gap: 8px; }
+  .contact-btn { padding: 8px 16px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">Buse Çarık</div>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a class="nav-link active" onclick="showPage('home')" href="#">Home</a>
+      <a class="nav-link" onclick="showPage('publications')" href="#">Publications</a>
+      <a class="nav-link" onclick="showPage('cv')" href="#">CV</a>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle light/dark" aria-label="Toggle theme">
+      <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<div class="page active" id="page-home">
+
+  <div class="hero">
+    <div class="photo-wrap">
+      <!-- Place your photo at images/profile.jpg -->
+      <img class="photo" src="images/profile.jpeg" alt="Buse Çarık"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="photo-placeholder" style="display:none">your photo here</div>
+      <div class="photo-links">
+        <a class="photo-link" href="mailto:buse@vt.edu" title="Email">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </a>
+        <a class="photo-link" href="https://scholar.google.com/citations?user=7EOwQJgAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" title="Google Scholar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </a>
+        <a class="photo-link" href="https://www.linkedin.com/in/buseçarık/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a class="photo-link" href="#" onclick="showPage('cv'); return false;" title="CV">
+          <span class="photo-link-text">CV</span>
+        </a>
+      </div>
+    </div>
+    <div>
+      <h1 class="greeting">Hi, I'm <em>Buse</em> 👋</h1>
+      <p style="font-size:12px;color:var(--text3);font-style:italic;margin-bottom:8px;letter-spacing:0.03em;">Buse (boo-SEH)</p>
+      <p class="tagline">PhD Student &middot; Virginia Tech &middot; SAIL Lab</p>
+      <p class="bio">
+        I'm a 4th year PhD student in Computer Science at Virginia Tech, working with
+        <a href="https://eugeniarho.com/" target="_blank" rel="noopener noreferrer">Dr. Eugenia Rho</a>
+        in the <a href="https://sail.cs.vt.edu/" target="_blank" rel="noopener noreferrer">SAIL Lab</a>.
+        My research sits at the intersection of HCI, NLP, and computational social science.
+        In my research I ask: How do individual differences in cognition, communication style, and emotion regulation shape the way people interact with and benefit from AI systems 
+        and how should we design AI systems that adapt to this diversity rather than defaulting to one-size-fits-all?
+      </p>
+      <!-- <p class="bio bio-note">
+        Outside research, I'm slowly learning the banjo (weekly lessons, no prior music background),
+        knitting, and always on the lookout for good Mediterranean food in Blacksburg.
+      </p>-->
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Recent updates</div>
+    <div class="news-list">
+      <div class="news-row">
+        <span class="news-date">Apr 2026</span>
+        <span class="news-text">New paper alert! <a href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">"Are we writing an advice column for Spock here?" Understanding Stereotypes in AI Advice for Autistic Users</a> <b>CHI 2026</b></span>
+      </div>
+      <div class="news-row">
+        <span class="news-date">Apr 2025</span>
+        <span class="news-text">Attending <b>CHI 2025</b> in Yokohama, Japan as a paper presenter 🇯🇵</span>
+      </div>
+      <!-- <div class="news-row">
+        <span class="news-date">Apr 2025</span>
+        <span class="news-text">Paper accepted at <b>CUI 2025</b></span>
+      </div>-->
+      <div class="news-row">
+        <span class="news-date">Mar 2025</span>
+        <span class="news-text">Presented at the <b>VTCAR Biennial Spring Conference</b>: Promoting Well-being for Autistic People Across the Lifespan</span>
+      </div>
+      <div class="news-row">
+        <span class="news-date">Jan 2025</span>
+        <span class="news-text">Paper accepted at <b>CHI 2025</b> -
+          <a href="https://arxiv.org/abs/2503.17504" target="_blank" rel="noopener noreferrer">Reimagining Support: Exploring Autistic Individuals' Visions for AI in Coping with Negative Self-Talk</a>
+        </span>
+      </div>
+      <div class="news-row">
+        <span class="news-date">Oct 2024</span>
+        <span class="news-text">Won the <b>VTCAR Student Award</b> for research on neuro-affirming human-AI interaction 🏆</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Featured publications</div>
+    <div class="pub-list">
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/chi2026.jpeg" alt="CHI 2026 teaser">
+          <span class="venue-badge">CHI 2026</span>
+        </div>
+        <div>
+          <div class="pub-title">"Are we writing an advice column for Spock here?" Understanding Stereotypes in AI Advice for Autistic Users</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">LLM bias</span><span class="pub-kw">LLM audit</span><span class="pub-kw">autism</span><span class="pub-kw">interview study</span><span class="pub-kw">AI advice</span>
+          </div>
+          <div class="pub-authors">Caleb Wohn, <b>Buse Çarık</b>, Xiaohan Ding, Sang Won Lee, Young-Ho Kim, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://arxiv.org/pdf/2601.12690" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <!-- Add teaser: images/papers/chi2025.jpg -->
+          <img
+            class="pub-thumb"
+            src="images/papers/chi2025.jpeg"
+            alt="CHI 2025 paper thumbnail"
+          />
+          <span class="venue-badge">CHI 2025</span>
+        </div>
+        <div>
+          <div class="pub-title">
+              Reimagining Support: Exploring Autistic Individuals' Visions for AI in Coping with Negative Self-Talk
+          </div>
+          <div class="pub-keywords">
+            <span class="pub-kw">negative self-talk</span><span class="pub-kw">mental health</span><span class="pub-kw">large language models</span><span class="pub-kw">autism</span>
+          </div>
+          <div class="pub-authors"><b>Buse Çarık</b>, Victoria Izaac, Xiaohan Ding, Angela Scarpa, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/group2025.jpeg" alt="GROUP 2025 teaser">
+          <span class="venue-badge">GROUP 2025</span>
+        </div>
+        <div>
+          <div class="pub-title">Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">large language models</span><span class="pub-kw">neurodivergent communities</span><span class="pub-kw">Reddit</span><span class="pub-kw">community workarounds</span>
+          </div>
+          <div class="pub-authors"><b>Buse Çarık</b>, Kaike Ping, Xiaohan Ding, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3701194" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3701194" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <a class="more-link" href="#" onclick="showPage('publications')">View all publications →</a>
+  </div>
+
+
+</div>
+
+<!-- ═══════════════ RESEARCH (removed from nav, kept for reference) ═══════════════ -->
+<div class="page" id="page-research" style="display:none !important">
+  <h1 class="page-title">Research</h1>
+  <div class="research-card">
+    <span class="research-tag">Active · IRB #25-331</span>
+    <div class="research-title">Autistic–Neurotypical Conversational Dynamics (AT-NT Study)</div>
+    <p class="research-desc">
+      A mixed-methods study examining how autistic and neurotypical individuals communicate
+      in text-based conversations and how they perceive those interactions. Participants are
+      matched into autistic–autistic, autistic–neurotypical, and neurotypical–neurotypical
+      dyads and complete structured chat sessions followed by annotation of their own
+      conversational moves. The study aims to surface communication asymmetries and
+      design implications for AI-mediated communication support tools.
+    </p>
+    <div class="tags-row" style="margin-top:14px;margin-bottom:0;">
+      <span class="interest-tag">HCI</span>
+      <span class="interest-tag">Mixed Methods</span>
+      <span class="interest-tag">Conversation Analysis</span>
+      <span class="interest-tag">Autism</span>
+    </div>
+    <div class="research-meta">
+      <div class="research-meta-item">Platform: <span>Chat-and-Annotate (custom Nuxt + SQLite)</span></div>
+      <div class="research-meta-item">Recruitment: <span>SPARK Registry</span></div>
+    </div>
+  </div>
+
+  <div class="research-card">
+    <span class="research-tag">In progress</span>
+    <div class="research-title">AI Receptivity and Emotion Regulation in Autistic Adults (EmotionAIze)</div>
+    <p class="research-desc">
+      A survey and computational study exploring what predicts autistic adults' openness
+      to using AI tools for emotion regulation. Findings show that reappraisal ability
+      and difficulties in emotion regulation independently predict AI receptivity, while
+      safety and comprehension concerns act as a separate gatekeeping factor. The work
+      surfaces distinct communication style profiles and examines how AI design preferences
+      vary across them.
+    </p>
+    <div class="tags-row" style="margin-top:14px;margin-bottom:0;">
+      <span class="interest-tag">Survey</span>
+      <span class="interest-tag">NLP</span>
+      <span class="interest-tag">Regression Modeling</span>
+      <span class="interest-tag">Emotion Regulation</span>
+    </div>
+    <div class="research-meta">
+      <div class="research-meta-item">Target venue: <span>TOCHI</span></div>
+    </div>
+  </div>
+
+  <div class="research-card">
+    <span class="research-tag">Published · CHI 2025</span>
+    <div class="research-title">Multimodal AI Tools for Coping with Negative Self-Talk</div>
+    <p class="research-desc">
+      Qualitative focus group research exploring how autistic adults envision using
+      AI tools to cope with negative self-talk. Through participatory sessions, we
+      surfaced design visions that center neurodivergent experience — including preferences
+      for non-judgmental, customizable, and transparent AI interactions. The work
+      informs participatory design principles for mental health AI.
+    </p>
+    <div class="tags-row" style="margin-top:14px;margin-bottom:0;">
+      <span class="interest-tag">Focus Groups</span>
+      <span class="interest-tag">Participatory Design</span>
+      <span class="interest-tag">Mental Health</span>
+      <span class="interest-tag">Thematic Analysis</span>
+    </div>
+    <div class="research-meta">
+      <div class="research-meta-item">Venue: <span>ACM CHI 2025, Yokohama</span></div>
+    </div>
+  </div>
+
+  <div class="research-card">
+    <span class="research-tag">Published · CHI 2024</span>
+    <div class="research-title">LLM Use in Neurodivergent Communities</div>
+    <p class="research-desc">
+      A computational social science study of how neurodivergent Reddit communities
+      adopted and adapted ChatGPT — including prompt-sharing practices, community-driven
+      workarounds, and expressed concerns. This work connects community-level AI adoption
+      to accessibility and neurodiversity scholarship.
+    </p>
+    <div class="tags-row" style="margin-top:14px;margin-bottom:0;">
+      <span class="interest-tag">Computational</span>
+      <span class="interest-tag">NLP</span>
+      <span class="interest-tag">Reddit Corpus</span>
+      <span class="interest-tag">Neurodiversity</span>
+    </div>
+    <div class="research-meta">
+      <div class="research-meta-item">Venue: <span>ACM CHI 2024</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ PUBLICATIONS ═══════════════ -->
+<div class="page" id="page-publications">
+  <h1 class="page-title">Publications</h1>
+  <!-- <p class="page-subtitle" style="margin-bottom: 36px;">* denotes equal contribution</p> -->
+
+  <div class="year-group">
+    <div class="year-label">2026</div>
+    <div class="pub-list">
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/chi2026.jpeg" alt="CHI 2026 teaser">
+          <span class="venue-badge">CHI 2026</span>
+        </div>
+        <div>
+          <div class="pub-title">"Are we writing an advice column for Spock here?" Understanding Stereotypes in AI Advice for Autistic Users</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">LLM bias</span><span class="pub-kw">LLM audit</span><span class="pub-kw">autism</span><span class="pub-kw">interview study</span><span class="pub-kw">AI advice</span>
+          </div>
+          <div class="pub-authors">Caleb Wohn, <b>Buse Çarık</b>, Xiaohan Ding, Sang Won Lee, Young-Ho Kim, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://arxiv.org/pdf/2601.12690" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="year-group">
+    <div class="year-label">2025</div>
+    <div class="pub-list">
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/chi2025.jpeg" alt="CHI 2025 teaser">
+          <span class="venue-badge">CHI 2025</span>
+        </div>
+        <div>
+          <div class="pub-title">
+              Reimagining Support: Exploring Autistic Individuals' Visions for AI in Coping with Negative Self-Talk
+          </div>
+          <div class="pub-keywords">
+            <span class="pub-kw">negative self-talk</span><span class="pub-kw">mental health</span><span class="pub-kw">large language models</span><span class="pub-kw">autism</span>
+          </div>
+          <div class="pub-authors"><b>Buse Çarık</b>, Victoria Izaac, Xiaohan Ding, Angela Scarpa, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/group2025.jpeg" alt="GROUP 2025 teaser">
+          <span class="venue-badge">GROUP 2025</span>
+        </div>
+        <div>
+          <div class="pub-title">Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">large language models</span><span class="pub-kw">neurodivergent communities</span><span class="pub-kw">Reddit</span><span class="pub-kw">community workarounds</span>
+          </div>
+          <div class="pub-authors"><b>Buse Çarık</b>, Kaike Ping, Xiaohan Ding, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3701194" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3701194" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/cui2025.jpeg" alt="CUI 2025 teaser">
+          <span class="venue-badge">CUI 2025</span>
+        </div>
+        <div>
+          <div class="pub-title">How Managers Perceive AI-Assisted Conversational Training for Workplace Communication</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">conversational AI</span><span class="pub-kw">workplace communication</span><span class="pub-kw">AI training</span><span class="pub-kw">manager perceptions</span><span class="pub-kw">CUI</span>
+          </div>
+          <div class="pub-authors">Lance T. Wilhelm, Xiaohan Ding, Kirk McInnis Knutsen, <b>Buse Çarık</b>, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3719160.3736639" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3719160.3736639" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/emnlp2025.jpeg" alt="EMNLP 2025 teaser">
+          <span class="venue-badge">EMNLP 2025</span>
+        </div>
+        <div>
+          <div class="pub-title">A Multi-Level Benchmark for Causal Language Understanding in Social Media Discourse</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">causal language</span><span class="pub-kw">benchmark</span><span class="pub-kw">social media</span><span class="pub-kw">NLP</span><span class="pub-kw">causal reasoning</span>
+          </div>
+          <div class="pub-authors">Xiaohan Ding, Kaike Ping, <b>Buse Çarık</b>, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://aclanthology.org/2025.emnlp-main.1464/" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://aclanthology.org/2025.emnlp-main.1464.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/vlhcc2025.jpeg" alt="VL/HCC 2025 teaser">
+          <span class="venue-badge">VL/HCC 2025</span>
+        </div>
+        <div>
+          <div class="pub-title">Designing Human-AI Collaboration to Support Learning in Counterspeech Writing</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">counterspeech</span><span class="pub-kw">human-AI collaboration</span><span class="pub-kw">hate speech</span><span class="pub-kw">writing support</span><span class="pub-kw">online safety</span>
+          </div>
+          <div class="pub-authors">Xiaohan Ding, Kaike Ping, Uma Sushmitha Gunturi, <b>Buse Çarık</b>, Sophia Stil, Lance T. Wilhelm, Taufiq Daryanto, James Hawdon, Sang Won Lee, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://ieeexplore.ieee.org/abstract/document/11303530/" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://ieeexplore.ieee.org/iel8/11303452/11303453/11303530.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="year-group">
+    <div class="year-label">2024</div>
+    <div class="pub-list">
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/chi2024.jpeg" alt="CHI 2024 teaser">
+          <span class="venue-badge">CHI 2024</span>
+        </div>
+        <div>
+          <div class="pub-title">Leveraging Prompt-Based Large Language Models: Predicting Pandemic Health Decisions and Outcomes Through Social Media Language</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">LLMs</span><span class="pub-kw">public health</span><span class="pub-kw">social media</span><span class="pub-kw">pandemic</span><span class="pub-kw">decision-making</span>
+          </div>
+          <div class="pub-authors">Xiaohan Ding, <b>Buse Çarık</b>, Uma Gunturi, Valerie Reyna, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3613904.3642117" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3613904.3642117" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="year-group">
+    <div class="year-label">2022</div>
+    <div class="pub-list">
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/lrec2022_ner.jpeg" alt="LREC 2022 NER teaser">
+          <span class="venue-badge">LREC 2022</span>
+        </div>
+        <div>
+          <div class="pub-title">A Twitter Corpus for Named Entity Recognition in Turkish</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">named entity recognition</span><span class="pub-kw">Turkish NLP</span><span class="pub-kw">Twitter corpus</span><span class="pub-kw">low-resource NLP</span>
+          </div>
+          <div class="pub-authors"><b>Buse Çarık</b>, Reyyan Yeniterzi</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://aclanthology.org/2022.lrec-1.484/" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://aclanthology.org/2022.lrec-1.484.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/lrec2022_hate.jpeg" alt="LREC 2022 Hate Speech teaser">
+          <span class="venue-badge">LREC 2022</span>
+        </div>
+        <div>
+          <div class="pub-title">A Turkish Hate Speech Dataset and Detection System</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">hate speech detection</span><span class="pub-kw">Turkish NLP</span><span class="pub-kw">dataset</span><span class="pub-kw">offensive language</span>
+          </div>
+          <div class="pub-authors">Fatih Beyhan, <b>Buse Çarık</b>, İnanç Arın, Ayşecan Terzioğlu, Berrin Yanıkoğlu, Reyyan Yeniterzi</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://aclanthology.org/2022.lrec-1.443.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/semeval2022.jpeg" alt="SemEval 2022 teaser">
+          <span class="venue-badge">SemEval 2022</span>
+        </div>
+        <div>
+          <div class="pub-title"><a href="https://aclanthology.org/2022.semeval-1.227/" target="_blank" rel="noopener noreferrer">SU-NLP at SemEval-2022 Task 11: Complex Named Entity Recognition with Entity Linking</a></div>
+          <div class="pub-keywords">
+            <span class="pub-kw">named entity recognition</span><span class="pub-kw">entity linking</span><span class="pub-kw">MultiCoNER</span><span class="pub-kw">Turkish NLP</span><span class="pub-kw">Wikipedia</span>
+          </div>
+          <div class="pub-authors"><b>Buse Çarık</b>, Fatih Beyhan, Reyyan Yeniterzi</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://aclanthology.org/2022.semeval-1.227/" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" href="https://aclanthology.org/2022.semeval-1.227.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="year-group">
+    <div class="year-label">2021</div>
+    <div class="pub-list">
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/clef2021.jpeg" alt="CLEF 2021 teaser">
+          <span class="venue-badge">CLEF 2021</span>
+        </div>
+        <div>
+          <div class="pub-title">SU-NLP at CheckThat! 2021: Check-Worthiness of Turkish Tweets</div>
+          <div class="pub-keywords">
+            <span class="pub-kw">fact-checking</span><span class="pub-kw">check-worthiness</span><span class="pub-kw">Turkish NLP</span><span class="pub-kw">BERT</span><span class="pub-kw">misinformation</span>
+          </div>
+          <div class="pub-authors"><b>Buse Çarık</b>, Reyyan Yeniterzi</div>
+          <div class="pub-links">
+            <a class="pub-link" href="https://www.academia.edu/download/76252766/paper-37.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ CV ═══════════════ -->
+<div class="page" id="page-cv">
+  <h1 class="page-title">Curriculum Vitae</h1>
+  <a class="cv-download" href="assets/CV.pdf" target="_blank" rel="noopener noreferrer">
+    ↓ Download full CV (PDF)
+  </a>
+
+  <div class="cv-section">
+    <div class="cv-section-title">Education</div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">PhD in Computer Science, Virginia Tech</span>
+        <span class="cv-item-date">2022 – Expected 2027</span>
+      </div>
+      <div class="cv-item-sub">Advised by Dr. Eugenia Rho · SAIL Lab</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">MS in Computer Science, Sabanci University</span>
+        <span class="cv-item-date">Dec 2022</span>
+      </div>
+      <div class="cv-item-sub">Advised by Dr. Reyyan Yeniterzi</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">BS in Computer Science, Sabanci University</span>
+        <span class="cv-item-date">Jun 2020</span>
+      </div>
+      <div class="cv-item-sub">Minor in Psychology</div>
+    </div>
+  </div>
+
+  <div class="cv-section">
+    <div class="cv-section-title">Awards &amp; Honors</div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">VTCAR Student Fellowship</span>
+        <span class="cv-item-date">2024</span>
+      </div>
+      <div class="cv-item-sub">Virginia Tech Center for Autism Research</div>
+      <div class="cv-item-detail">Awarded for research proposal: Developing Human-AI Interaction Strategies to Support Autistic Adults in Coping with Negative Self-Talk</div>
+    </div>
+  </div>
+
+  <div class="cv-section">
+    <div class="cv-section-title">Teaching &amp; Service</div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Graduate Teaching Assistant</span>
+        <span class="cv-item-date">2020 – Present</span>
+      </div>
+      <div class="cv-item-sub">Virginia Tech · Introductory AI course</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Event Coordinator</span>
+        <span class="cv-item-date">Ongoing</span>
+      </div>
+      <div class="cv-item-sub">Center for Human-Computer Interaction (CHCI), Virginia Tech</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Undergraduate Research Mentor</span>
+        <span class="cv-item-date">Ongoing</span>
+      </div>
+      <div class="cv-item-sub">SAIL Lab, Virginia Tech</div>
+    </div>
+  </div>
+
+  <div class="cv-section">
+    <div class="cv-section-title">Selected Talks</div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">VTCAR Biennial Spring Autism Conference</span>
+        <span class="cv-item-date">Mar 2025</span>
+      </div>
+      <div class="cv-item-detail">Designing Neuro-Affirming Human-AI Interactions for Coping with Negative Self-Talk in Autistic Adults</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">CHCI Seminar, Virginia Tech</span>
+        <span class="cv-item-date">Feb 2025</span>
+      </div>
+      <div class="cv-item-detail">Designing Multimodal AI Tools to Support Autistic Adults with Negative Self-Talk</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Symposium on the Human-Centered Future of Work, Virginia Tech</span>
+        <span class="cv-item-date">Nov 2023</span>
+      </div>
+      <div class="cv-item-detail">Supporting Mental Health in Neurodiverse Communities: Enhancing LLM Accessibility through Multimodal Human-AI Interactions</div>
+    </div>
+  </div>
+
+  <p style="font-size: 13px; color: var(--text3); margin-top: 8px;">
+    If you're autistic and want to talk about research, AI tools, or anything related to my work — please reach out. I'm always happy to connect.
+  </p>
+
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <span class="footer-text">buse [at] vt [dot] edu</span>
+  <span class="footer-text">Last updated: March 2026 &middot; <a href="https://github.com/buse-carik/buse-carik.github.io" target="_blank" rel="noopener noreferrer">Source</a></span>
+</footer>
+
+<script>
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    const links = document.querySelectorAll('.nav-link');
+    const map = ['home','publications','cv'];
+    links[map.indexOf(name)]?.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+  }
+
+  // Respect system preference on load
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+</script>
+</body>
+</html>
