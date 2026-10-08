@@ -4,10 +4,80 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Buse Çarık</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="Buse Çarık is a PhD candidate in Computer Science at Virginia Tech studying human-AI interaction, neurodiversity, and LLM multi-agent systems. On the 2027–2028 academic job market.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script>
+  const root = document.documentElement;
+  function readPreference(key) {
+    try { return localStorage.getItem(key); } catch { return null; }
+  }
+  function savePreference(key, value) {
+    try { localStorage.setItem(key, value); } catch { /* Preferences still work for this visit. */ }
+  }
+  root.dataset.readingFont = readPreference('reading-font') === 'opendyslexic' ? 'opendyslexic' : 'default';
+  const storedContrast = readPreference('high-contrast');
+  const osWantsContrast = window.matchMedia('(prefers-contrast: more)').matches;
+  root.dataset.contrast = storedContrast === 'true' || (storedContrast === null && osWantsContrast) ? 'high' : 'default';
+  root.dataset.textSize = ['large', 'larger'].includes(readPreference('text-size')) ? readPreference('text-size') : 'default';
+  root.dataset.spacing = readPreference('text-spacing') === 'true' ? 'wide' : 'default';
+  root.dataset.width = readPreference('narrow-width') === 'true' ? 'narrow' : 'default';
+  root.dataset.calm = readPreference('calm-mode') === 'true' ? 'on' : 'default';
+  root.dataset.motion = readPreference('reduce-motion') === 'false' ? 'system' : 'reduce';
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+  let themePreference = readPreference('color-theme');
+  if (!['light', 'dark', 'system'].includes(themePreference)) themePreference = 'system';
+  function applyTheme() {
+    root.dataset.theme = themePreference === 'system' ? (systemTheme.matches ? 'dark' : 'light') : themePreference;
+  }
+  applyTheme();
+  systemTheme.addEventListener('change', applyTheme);
+</script>
 <style>
+:root {
+  --font-body: 'DM Sans', sans-serif;
+  --font-heading: 'Lora', serif;
+}
+:root[data-reading-font="opendyslexic"] {
+  --font-body: 'OpenDyslexic', sans-serif;
+  --font-heading: 'OpenDyslexic', sans-serif;
+}
+
+  @font-face {
+  font-family: 'OpenDyslexic';
+  src: url('assets/fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('assets/fonts/OpenDyslexic-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('assets/fonts/OpenDyslexic-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('assets/fonts/OpenDyslexic-BoldItalic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
 :root[data-theme="light"] {
   --bg:         #ffffff;
   --bg2:        #f4f2fc;
@@ -44,11 +114,11 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.65;
   transition: background 0.3s, color 0.3s;
 }
@@ -62,27 +132,29 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 0 48px;
-  height: 58px;
+  min-height: 58px;
+  flex-wrap: wrap;
+  gap: 8px 24px;
   background: var(--bg);
   border-bottom: 0.5px solid var(--border);
   transition: background 0.3s;
 }
 
 .nav-logo {
-  font-family: 'Lora', serif;
-  font-size: 18px;
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
   font-weight: 500;
   color: var(--text);
   cursor: pointer;
   letter-spacing: -0.01em;
 }
 
-.nav-right { display: flex; align-items: center; gap: 32px; }
+.nav-right { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 24px; }
 
 .nav-links { display: flex; gap: 28px; }
 
 .nav-link {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 400;
   color: var(--text3);
   cursor: pointer;
@@ -96,21 +168,57 @@ nav {
   border-bottom-color: var(--accent);
 }
 
-.theme-btn {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent;
-  border: 0.5px solid var(--border2);
-  border-radius: 50%;
+/* Reading font switch: the native checkbox provides keyboard support. */
+.nav-controls { display: flex; align-items: center; gap: 16px; }
+.font-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 0.75rem;
+  color: var(--text);
   cursor: pointer;
-  color: var(--text2);
-  transition: background 0.2s, color 0.2s;
-  flex-shrink: 0;
-  padding: 0;
 }
-.theme-btn:hover { background: var(--bg2); color: var(--accent); }
-[data-theme="dark"] .theme-btn .icon-sun { display: none; }
-[data-theme="light"] .theme-btn .icon-moon { display: none; }
+.font-toggle input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.font-toggle-track {
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 1px solid var(--text3);
+  border-radius: 12px;
+  background: var(--bg2);
+}
+.font-toggle-track::before {
+  content: '';
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 3px;
+  border-radius: 50%;
+  background: var(--text);
+}
+.font-toggle input:checked + .font-toggle-track { background: var(--accent-dim); border-color: var(--accent); }
+.font-toggle input:checked + .font-toggle-track::before { transform: translateX(14px); background: var(--accent); }
+.font-toggle:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.font-toggle-state { min-width: 3ch; }
+.font-toggle-on { display: none; }
+.font-toggle input:checked ~ .font-toggle-state .font-toggle-on { display: inline; }
+.font-toggle input:checked ~ .font-toggle-state .font-toggle-off { display: none; }
+@media (max-width: 900px) {
+  nav { padding-top: 8px; padding-bottom: 8px; }
+  .nav-right { width: 100%; justify-content: space-between; }
+  .nav-links { flex-wrap: wrap; gap: 16px; }
+}
 
 /* ── PAGES ── */
 .page { display: none; max-width: 980px; margin: 0 auto; padding: 0 32px 56px; }
@@ -134,7 +242,7 @@ nav {
   gap: 6px;
   margin-top: 12px;
   justify-content: center;
-  max-width: 200px;
+  max-width: 220px;
 }
 .photo-link {
   width: 40px; height: 40px;
@@ -149,7 +257,7 @@ nav {
 }
 .photo-link:hover { color: var(--accent); background: var(--accent-dim); border-color: var(--accent); }
 .photo-link-text {
-  font-size: 10.5px;
+  font-size: 0.6562rem;
   font-weight: 700;
   letter-spacing: 0.04em;
 }
@@ -173,7 +281,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--text3);
   text-align: center;
   padding: 16px;
@@ -181,8 +289,8 @@ nav {
 }
 
 .greeting {
-  font-family: 'Lora', serif;
-  font-size: 46px;
+  font-family: var(--font-heading);
+  font-size: 2.875rem;
   font-weight: 500;
   line-height: 1.1;
   margin-bottom: 10px;
@@ -191,7 +299,7 @@ nav {
 .greeting em { font-style: italic; color: var(--accent); }
 
 .tagline {
-  font-size: 14.5px;
+  font-size: 0.9062rem;
   color: var(--text3);
   margin-bottom: 14px;
   font-weight: 400;
@@ -199,25 +307,17 @@ nav {
 }
 
 .bio {
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.8;
   color: var(--text3);
   margin-bottom: 10px;
   max-width: 100%;
 }
-.bio-note {
-  font-size: 15px;
-  margin-bottom: 18px;
-}
 .bio a { color: var(--accent); text-decoration: none; }
 .bio a:hover { text-decoration: underline; }
 
-
-/* ── SECTION ── */
-.section { margin-bottom: 52px; }
-
 .sec-label {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -227,14 +327,7 @@ nav {
   align-items: center;
   gap: 9px;
 }
-.sec-label::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  flex-shrink: 0;
-}
+.sec-label::before { display: none; }
 
 /* NEWS */
 .news-list { display: flex; flex-direction: column; gap: 8px; }
@@ -250,7 +343,7 @@ nav {
 }
 .news-row:hover { border-color: var(--accent-mid); box-shadow: var(--shadow); }
 .news-date {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   color: var(--accent);
   background: var(--accent-dim);
@@ -261,7 +354,7 @@ nav {
   letter-spacing: 0.02em;
   margin-top: 2px;
 }
-.news-text { font-size: 14.5px; color: var(--text); line-height: 1.6; }
+.news-text { font-size: 0.9062rem; color: var(--text); line-height: 1.6; }
 .news-text b { color: var(--text); font-weight: 600; }
 .news-text a { color: var(--accent); text-decoration: none; }
 
@@ -292,23 +385,9 @@ nav {
   border: 0.5px solid var(--border);
   display: block;
 }
-.pub-thumb-placeholder {
-  width: 112px;
-  height: 80px;
-  border-radius: 7px;
-  background: var(--bg2);
-  border: 1px dashed var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  color: var(--text3);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
 
 .venue-badge {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--accent);
   background: var(--accent-dim);
@@ -322,7 +401,7 @@ nav {
 }
 
 .pub-title {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--text);
   line-height: 1.45;
@@ -330,11 +409,12 @@ nav {
 }
 .pub-title a { color: var(--text); text-decoration: none; }
 .pub-title a:hover { color: var(--accent); }
-.pub-authors { font-size: 13.5px; color: var(--text3); line-height: 1.5; }
+.pub-authors { font-size: 0.8438rem; color: var(--text3); line-height: 1.5; }
 .pub-authors b { color: var(--accent); font-weight: 500; }
-.pub-links { margin-top: 6px; display: flex; gap: 8px; }
+.pub-venue-note { font-size: 0.7812rem; font-style: italic; color: var(--text3); margin-top: 2px; }
+.pub-links { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px; }
 .pub-link {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--accent);
   text-decoration: none;
   border: 0.5px solid var(--border2);
@@ -344,7 +424,7 @@ nav {
 .pub-link:hover { background: var(--accent-dim); }
 
 .more-link {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--accent);
   text-decoration: none;
   display: inline-block;
@@ -354,63 +434,20 @@ nav {
 
 /* ── RESEARCH PAGE ── */
 .page-title {
-  font-family: 'Lora', serif;
-  font-size: 26px;
+  font-family: var(--font-heading);
+  font-size: 1.625rem;
   font-weight: 500;
   color: var(--text);
   margin: 52px 0 8px;
   letter-spacing: -0.02em;
 }
-.page-subtitle { font-size: 14px; color: var(--text3); margin-bottom: 44px; line-height: 1.7; }
-
-.research-card {
-  border: 0.5px solid var(--border);
-  border-left: 4px solid var(--accent);
-  border-radius: 0 12px 12px 0;
-  padding: 28px 28px 24px;
-  margin-bottom: 20px;
-  background: var(--surface);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.research-card:hover { border-color: var(--border2); border-left-color: var(--accent); box-shadow: 0 4px 16px rgba(83,74,183,0.1); }
-
-.research-tag {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--accent);
-  background: var(--accent-dim);
-  padding: 3px 10px;
-  border-radius: 6px;
-  display: inline-block;
-  margin-bottom: 12px;
-}
-.research-title {
-  font-family: 'Lora', serif;
-  font-size: 17px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 10px;
-  line-height: 1.35;
-}
-.research-desc { font-size: 13.5px; color: var(--text3); line-height: 1.8; }
-.research-meta {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 0.5px solid var(--border);
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.research-meta-item { font-size: 12px; color: var(--text3); }
-.research-meta-item span { color: var(--text); font-weight: 500; }
+.page-subtitle { font-size: 0.875rem; color: var(--text3); margin-bottom: 44px; line-height: 1.7; }
 
 /* ── PUBLICATIONS PAGE ── */
 .year-group { margin-bottom: 36px; }
 .year-label {
-  font-family: 'Lora', serif;
-  font-size: 20px;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
   font-weight: 500;
   color: var(--text);
   margin-bottom: 16px;
@@ -423,7 +460,7 @@ nav {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--accent);
   border: 0.5px solid var(--border2);
   padding: 8px 18px;
@@ -436,8 +473,8 @@ nav {
 
 .cv-section { margin-bottom: 44px; }
 .cv-section-title {
-  font-family: 'Lora', serif;
-  font-size: 17px;
+  font-family: var(--font-heading);
+  font-size: 1.0625rem;
   font-weight: 500;
   color: var(--text);
   margin-bottom: 18px;
@@ -452,10 +489,10 @@ nav {
   margin-bottom: 3px;
   gap: 16px;
 }
-.cv-item-title { font-size: 14px; font-weight: 500; color: var(--text); }
-.cv-item-date { font-size: 12px; color: var(--text3); white-space: nowrap; flex-shrink: 0; }
-.cv-item-sub { font-size: 13px; color: var(--text3); }
-.cv-item-detail { font-size: 12.5px; color: var(--text3); margin-top: 3px; line-height: 1.6; }
+.cv-item-title { font-size: 0.875rem; font-weight: 500; color: var(--text); }
+.cv-item-date { font-size: 0.75rem; color: var(--text3); white-space: nowrap; flex-shrink: 0; }
+.cv-item-sub { font-size: 0.8125rem; color: var(--text3); }
+.cv-item-detail { font-size: 0.7812rem; color: var(--text3); margin-top: 3px; line-height: 1.6; }
 
 /* ── FOOTER ── */
 footer {
@@ -468,51 +505,19 @@ footer {
   align-items: center;
   gap: 16px;
 }
-.footer-text { font-size: 12px; color: var(--text3); }
+.footer-text { font-size: 0.75rem; color: var(--text3); }
 .footer-text a { color: var(--accent); text-decoration: none; }
 
 /* ── PAPER KEYWORDS ── */
 .pub-keywords { display: flex; flex-wrap: wrap; gap: 4px; margin: 5px 0 4px; }
 .pub-kw {
-  font-size: 10.5px;
+  font-size: 0.6562rem;
   color: var(--text3);
-  background: var(--bg2);
-  border: 0.5px solid var(--border);
+  background: transparent;
+  border: 1px solid var(--border2);
   padding: 2px 7px;
   border-radius: 4px;
 }
-
-/* ── RESEARCH INTEREST TAGS ── */
-.tags-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
-.interest-tag {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 5px 14px;
-  border-radius: 20px;
-  background: var(--bg2);
-  color: var(--text2);
-  border: 1px solid var(--border2);
-  transition: background 0.2s, transform 0.15s;
-  cursor: default;
-  user-select: none;
-}
-.interest-tag:hover { background: var(--accent-dim); transform: translateY(-1px); }
-
-/* ── TALKS ── */
-.talk-list { display: flex; flex-direction: column; gap: 2px; }
-.talk-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  transition: background 0.18s;
-}
-.talk-item:hover { background: var(--bg2); }
-.talk-icon { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
-.talk-title { font-size: 13.5px; color: var(--text); font-weight: 500; line-height: 1.45; margin-bottom: 3px; }
-.talk-meta { font-size: 12px; color: var(--text3); }
-
 
 /* ── ANIMATIONS ── */
 @keyframes fadeUp {
@@ -526,62 +531,286 @@ footer {
   nav { padding: 0 20px; }
   .page { padding: 0 20px 60px; }
   .hero { grid-template-columns: 1fr; gap: 24px; padding: 36px 0 36px; }
-  .greeting { font-size: 28px; }
+  .greeting { font-size: 1.75rem; }
   .photo-placeholder, .photo { width: 110px; height: 110px; }
   footer { flex-direction: column; align-items: flex-start; gap: 6px; padding: 24px 20px; }
   .pub-item { grid-template-columns: 1fr; gap: 10px; }
   .pub-left { flex-direction: row; align-items: center; gap: 12px; }
-  .pub-thumb, .pub-thumb-placeholder { width: 80px; height: 58px; }
+  .pub-thumb{ width: 80px; height: 58px; }
   .news-row { grid-template-columns: 1fr; gap: 2px; }
-  .contact-row { gap: 8px; }
-  .contact-btn { padding: 8px 16px; font-size: 12px; }
+  .cv-item-header { flex-wrap: wrap; gap: 4px 16px; }
+}
+
+/* Accessibility preferences and keyboard navigation */
+:root[data-theme="dark"] { --text3: #aaa69d; }
+:root[data-contrast="high"][data-theme="light"] {
+  --bg: #ffffff; --bg2: #f2f2f2; --bg3: #e8e8e8; --surface: #ffffff;
+  --text: #111111; --text2: #003a75; --text3: #333333;
+  --accent: #003a75; --accent-dim: #e6eff8; --accent-mid: #003a75;
+  --border: #555555; --border2: #555555;
+}
+:root[data-contrast="high"][data-theme="dark"] {
+  --bg: #111111; --bg2: #202020; --bg3: #292929; --surface: #111111;
+  --text: #ffffff; --text2: #ffdd66; --text3: #eeeeee;
+  --accent: #ffdd66; --accent-dim: #302a16; --accent-mid: #ffdd66;
+  --border: #bbbbbb; --border2: #bbbbbb;
+}
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.skip-link { position: fixed; top: 8px; left: 8px; transform: translateY(-200%); z-index: 200; padding: 12px; background: var(--bg); color: var(--text); }
+.skip-link:focus { transform: none; }
+.nav-logo { text-decoration: none; }
+.nav-link { min-height: 44px; display: inline-flex; align-items: center; }
+.nav-link.active { font-weight: 700; border-bottom-width: 3px; }
+#main-content a, footer a { text-decoration: underline; text-underline-offset: 0.18em; }
+main { overflow-wrap: anywhere; }
+.hero > *, .pub-item > * { min-width: 0; }
+.accessibility { position: relative; }
+.accessibility summary { cursor: pointer; min-height: 44px; display: list-item; align-content: center; padding: 8px; font-size: 0.875rem; color: var(--text); }
+.accessibility-panel { position: absolute; right: 0; top: 100%; width: min(340px, calc(100vw - 40px)); max-height: 65vh; overflow-y: auto; padding: 18px; background: var(--bg); border: 1px solid var(--text3); border-radius: 8px; box-shadow: var(--shadow); }
+.accessibility-panel p { font-size: 0.8125rem; color: var(--text3); margin-bottom: 12px; }
+.accessibility-panel .font-toggle { display: flex; font-size: 0.8125rem; flex-wrap: wrap; }
+.reset-preferences { display: block; width: 100%; min-height: 44px; margin-top: 12px; padding: 10px; font: inherit; font-size: 0.8125rem; color: var(--text); background: var(--bg2); border: 1px solid var(--text3); border-radius: 6px; cursor: pointer; }
+.reset-preferences:hover { background: var(--accent-dim); }
+.accessibility-panel .reset-status { margin: 8px 0 0; }
+.preference { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 0.8125rem; }
+.preference input { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--accent); }
+.preference select { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--text3); padding: 8px; max-width: 100%; }
+@media (max-width: 600px) {
+  nav { position: relative; padding: 8px 20px; }
+  .accessibility-panel { position: static; width: 100%; margin-top: 8px; }
+  .nav-controls:has(.accessibility[open]) { width: 100%; }
+  .accessibility[open] { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+html[data-motion="reduce"] { scroll-behavior: auto; }
+html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-motion="reduce"] *::after { animation: none !important; transition: none !important; }
+
+/* Research list */
+.rp-item { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 36px; padding: 32px 0; border-bottom: 1px solid var(--border2); align-items: start; }
+.rp-item:first-of-type { padding-top: 20px; }
+.rp-item:last-of-type { border-bottom: 0; }
+.rp-img { width: 100%; height: 150px; object-fit: contain; background: #fff; border: 1px solid var(--border2); border-radius: 14px; display: block; }
+.rp-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 16px; }
+.rp-tag { font-size: 0.8125rem; color: var(--text3); background: transparent; border: 1px solid var(--border2); padding: 4px 12px; border-radius: 8px; }
+.rp-status { font-family: var(--font-body); font-size: 0.875rem; font-weight: 400; letter-spacing: 0; color: var(--text3); margin-left: 12px; white-space: nowrap; }
+.rp-title { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; color: var(--text); margin-bottom: 12px; }
+.rp-desc { font-size: 1rem; line-height: 1.8; color: var(--text3); }
+.rp-desc + .rp-desc { margin-top: 10px; }
+.rp-links { margin-top: 14px; display: flex; gap: 14px; font-size: 0.9375rem; }
+.rp-links a { color: var(--text3); }
+.rp-links a:hover { color: var(--accent); }
+@media (max-width: 700px) {
+  .rp-item { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .rp-title { font-size: 1.3125rem; }
+}
+
+/* Job-market banner and hero tags */
+.job-market { font-size: 0.9688rem; line-height: 1.65; color: #2a2412; max-width: 72ch; margin-top: 18px; padding: 14px 18px; background: #fdf3cf; border-left: 4px solid #d9a521; border-radius: 4px; }
+:root[data-theme="dark"] .job-market { background: #3a3218; color: #f3e9c0; border-left-color: #d9a521; }
+:root[data-contrast="high"] .job-market { background: transparent; color: var(--text); border: 2px solid var(--text); }
+.job-market strong { color: var(--text); }
+.job-market a { color: var(--accent); }
+
+/* Research page */
+.research-intro { font-size: 0.9688rem; line-height: 1.8; color: var(--text3); max-width: 75ch; margin-bottom: 20px; }
+
+/* Personal page */
+.personal-intro { max-width: none; }
+.personal-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 18px; margin: 28px 0 40px; align-items: stretch; }
+.personal-grid .hobby-card { grid-column: span 2; }
+.personal-grid .hobby-card:nth-child(n+4) { grid-column: span 3; }
+@media (max-width: 800px) {
+  .personal-grid { grid-template-columns: minmax(0, 1fr); }
+  .personal-grid .hobby-card, .personal-grid .hobby-card:nth-child(n+4) { grid-column: auto; }
+}
+.hobby-card { border: 1px solid var(--border2); border-radius: 12px; padding: 20px 22px; background: var(--surface); }
+.hobby-card h2 { font-family: var(--font-heading); font-size: 1.0625rem; font-weight: 500; margin-bottom: 6px; }
+.hobby-card p { font-size: 0.875rem; line-height: 1.75; color: var(--text3); }
+.hobby-photo { width: 100%; height: 260px; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 14px; background: var(--bg2); }
+.hobby-photo-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.hobby-photo-pair .hobby-photo { margin-bottom: 0; }
+.cv-item-detail a { color: var(--accent); }
+.cv-item > .cv-item-header { margin-bottom: 2px; }
+
+/* Homepage: research with an updates sidebar. */
+#page-home { max-width: 1340px; }
+#page-home .hero { grid-template-columns: 220px minmax(0, 1fr); gap: 40px; padding: 40px 0 32px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+#page-home .photo { width: 220px; height: 220px; }
+#page-home .bio { max-width: 72ch; }
+.home-research { grid-area: research; min-width: 0; }
+.home-updates { grid-area: updates; min-width: 0; padding-right: 24px; border-right: 1px solid var(--border); }
+.home-updates .news-list { gap: 10px; }
+.home-updates .news-row { display: block; padding: 0 0 10px; margin-bottom: 0; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
+.home-updates .news-row:hover { box-shadow: none; }
+.home-updates .news-date { display: inline-block; margin: 0 0 3px; padding: 0; background: transparent; color: var(--text3); }
+.home-updates .news-text a { color: inherit; text-decoration: underline; }
+.home-updates .older-updates summary { color: var(--text3); }
+.home-updates .news-text { display: block; font-size: 0.8438rem; }
+.older-updates summary { cursor: pointer; color: var(--text2); min-height: 44px; padding: 10px 0; font-size: 0.8125rem; }
+.pub-summary { font-size: 0.875rem; line-height: 1.65; color: var(--text3); margin: 8px 0; }
+.home-research .pub-item:first-child { padding-top: 0; }
+@media (max-width: 850px) {
+  .home-updates { padding-right: 0; border-right: 0; }
+}
+@media (max-width: 600px) {
+  #page-home .hero { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 28px; }
+  #page-home .photo { width: 130px; height: 130px; }
+}
+
+/* Home layout: intro beside updates, research full width below */
+.home-top { display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 29%, 390px); gap: 32px; align-items: start; padding-bottom: 36px; margin-bottom: 36px; border-bottom: 1px solid var(--border); }
+#page-home .home-top .hero { padding: 40px 0 0; margin: 0; border-bottom: 0; }
+.home-top .home-updates { grid-area: auto; margin-top: 28px; padding: 12px 0 0 36px; border-right: 0; border-left: 1px solid var(--border); }
+.home-research { grid-area: auto; }
+.home-research .pub-item { grid-template-columns: 180px minmax(0, 1fr); gap: 28px; padding: 22px 0; }
+.home-research .pub-thumb { width: 180px; height: 125px; object-fit: contain; background: #fff; }
+.home-research .pub-title { font-size: 1.0625rem; }
+.home-research .pub-summary { font-size: 0.9375rem; }
+@media (max-width: 900px) {
+  .home-top { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .home-top .home-updates { margin-top: 20px; padding: 28px 0 0 0; border-left: 0; border-top: 1px solid var(--border); margin-top: 20px; }
+}
+@media (max-width: 600px) {
+  .home-research .pub-item { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .home-research .pub-thumb { width: 150px; height: 105px; }
+}
+
+
+/* ── Accessibility additions ── */
+html { font-size: 100%; }
+html[data-text-size="large"] { font-size: 125%; }
+html[data-text-size="larger"] { font-size: 150%; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.pronunciation { font-size: 0.9375rem; color: var(--text3); margin-bottom: 8px; }
+.link-pending { color: var(--text3); font-size: 0.9375rem; }
+.pub-link.link-pending { border-style: dashed; font-size: 0.75rem; }
+.cv-note { font-size: 0.9375rem; color: var(--text3); margin: -32px 0 40px; }
+.nav-logo { display: inline-flex; align-items: center; min-height: 44px; }
+.footer-text a { display: inline-block; padding: 12px 4px; }
+.statement { max-width: 72ch; }
+.statement h2 { font-family: var(--font-heading); font-size: 1.25rem; font-weight: 500; margin: 32px 0 10px; }
+.statement p, .statement li { font-size: 1rem; line-height: 1.75; color: var(--text); margin-bottom: 10px; }
+.statement ul { padding-left: 1.3rem; }
+.statement-date { color: var(--text3); font-size: 0.875rem; }
+.statement a { color: var(--accent); }
+
+html[data-spacing="wide"] :is(p, li, span, a, div, h1, h2, h3, summary, figcaption, label) { line-height: 1.8; letter-spacing: 0.12em; word-spacing: 0.16em; }
+html[data-spacing="wide"] :is(p, li) { margin-bottom: 1.2em; }
+
+html[data-width="narrow"] :is(.bio, .rp-desc, .pub-summary, .research-intro, .cv-item-detail, .statement p, .statement li, .job-market) { max-width: 55ch; }
+
+html[data-calm="on"] .job-market { background: transparent; color: var(--text); border: 1px solid var(--text3); border-left-width: 4px; }
+html[data-calm="on"] :is(.venue-badge, .rp-tag, .pub-kw, .pub-link, .news-row) { background: transparent; }
+html[data-calm="on"] .greeting em { color: inherit; font-style: normal; }
+html[data-calm="on"] .hobby-card h2 span[aria-hidden="true"] { display: none; }
+html[data-calm="on"] *, html[data-calm="on"] *::before, html[data-calm="on"] *::after { transition: none !important; animation: none !important; box-shadow: none !important; }
+
+@media (forced-colors: active) {
+  a { color: LinkText; }
+  .job-market, .rp-tag, .pub-kw, .venue-badge, .photo-link, .pub-link, .hobby-card, .rp-img, .pub-thumb, .hobby-photo, .news-row, .cv-download { border: 1px solid CanvasText; }
+  .nav-link.active { border-bottom-color: Highlight; }
+  .font-toggle-track { border-color: ButtonText; forced-color-adjust: none; background: Canvas; }
+  .font-toggle-track::before { background: ButtonText; }
+  .font-toggle input:checked + .font-toggle-track::before { background: Highlight; }
+  :focus-visible { outline: 3px solid Highlight; }
+}
+
+@media print {
+  nav, .skip-link, .accessibility, .photo-links, .older-updates summary { display: none !important; }
+  body { background: #fff; color: #000; font-size: 11pt; }
+  .page { display: none !important; }
+  .page.active { display: block !important; max-width: none; padding: 0; animation: none; }
+  .home-top { display: block; border: 0; }
+  .home-top .home-updates { border: 0; margin: 12px 0 0; padding: 0; }
+  .job-market { background: none; border: 1px solid #000; color: #000; }
+  a { color: #000; text-decoration: underline; }
+  #main-content a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; word-break: break-all; }
+  .pub-item, .rp-item, .cv-item, .hobby-card { break-inside: avoid; }
+  footer { border-top: 1px solid #999; }
 }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo" onclick="showPage('home')">Buse Çarık</div>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<nav aria-label="Main navigation">
+  <a class="nav-logo" href="#home" onclick="showPage('home'); return false;">Buse Çarık</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a class="nav-link active" onclick="showPage('home')" href="#">Home</a>
-      <a class="nav-link" onclick="showPage('publications')" href="#">Publications</a>
-      <a class="nav-link" onclick="showPage('cv')" href="#">CV</a>
+      <a class="nav-link active" data-page="home" aria-current="page" onclick="showPage('home'); return false;" href="#home">Home</a>
+      <a class="nav-link" data-page="research" onclick="showPage('research'); return false;" href="#research">Research</a>
+      <a class="nav-link" data-page="publications" onclick="showPage('publications'); return false;" href="#publications">Publications</a>
+      <a class="nav-link" data-page="cv" onclick="showPage('cv'); return false;" href="#cv">CV</a>
+      <a class="nav-link" data-page="personal" onclick="showPage('personal'); return false;" href="#personal">Personal</a>
     </div>
-    <button class="theme-btn" onclick="toggleTheme()" title="Toggle light/dark" aria-label="Toggle theme">
-      <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
+    <div class="nav-controls">
+      <details class="accessibility" id="accessibility-menu">
+        <summary>Accessibility</summary>
+        <div class="accessibility-panel">
+          <p>Choose what makes this site easier to read. Your choices are saved in this browser.</p>
+      <label class="font-toggle" for="reading-font-toggle">
+        <span>OpenDyslexic font</span>
+        <input type="checkbox" id="reading-font-toggle" role="switch">
+        <span class="font-toggle-track" aria-hidden="true"></span>
+        <span class="font-toggle-state" aria-hidden="true"><span class="font-toggle-off">Off</span><span class="font-toggle-on">On</span></span>
+      </label>
+          <label class="preference" for="contrast-toggle"><input id="contrast-toggle" type="checkbox" aria-describedby="contrast-help">High contrast</label>
+          <p id="contrast-help">Stronger contrast, with underlined links and visible control states in every color theme.</p>
+          <label class="preference" for="motion-toggle"><input id="motion-toggle" type="checkbox" checked aria-describedby="motion-help">Reduce motion</label>
+          <p id="motion-help">On by default. When off, follows your device’s reduced-motion setting.</p>
+          <label class="preference" for="theme-select">Color theme
+            <select id="theme-select"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          </label>
+          <label class="preference" for="text-size-select">Text size
+            <select id="text-size-select"><option value="default">Default</option><option value="large">Large (125%)</option><option value="larger">Larger (150%)</option></select>
+          </label>
+          <label class="preference" for="spacing-toggle"><input id="spacing-toggle" type="checkbox" aria-describedby="spacing-help">Increase text spacing</label>
+          <p id="spacing-help">Adds space between lines, words, and letters.</p>
+          <label class="preference" for="width-toggle"><input id="width-toggle" type="checkbox" aria-describedby="width-help">Narrow reading width</label>
+          <p id="width-help">Shortens long lines of text.</p>
+          <label class="preference" for="calm-toggle"><input id="calm-toggle" type="checkbox" aria-describedby="calm-help">Simplified, calmer layout</label>
+          <p id="calm-help">Removes tinted backgrounds, hover effects, and decoration.</p>
+          <button type="button" class="reset-preferences" id="reset-preferences" aria-describedby="reset-help">Reset accessibility preferences</button>
+          <p id="reset-help">Restores the default font, text size and spacing, standard contrast, reduced motion on, and system color theme.</p>
+          <p id="reset-status" class="reset-status" role="status" aria-atomic="true"></p>
+        </div>
+      </details>
+    </div>
   </div>
 </nav>
 
+<main id="main-content" tabindex="-1">
 <!-- ═══════════════ HOME ═══════════════ -->
 <div class="page active" id="page-home">
 
+  <div class="home-top">
   <div class="hero">
     <div class="photo-wrap">
       <!-- Place your photo at images/profile.jpg -->
-      <img class="photo" src="images/profile.jpeg" alt="Buse Çarık"
+      <img class="photo" src="images/profile.jpeg" alt="Portrait of Buse Çarık"
            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="photo-placeholder" style="display:none">your photo here</div>
+      <div class="photo-placeholder" style="display:none">Portrait unavailable</div>
       <div class="photo-links">
-        <a class="photo-link" href="mailto:buse@vt.edu" title="Email">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <a class="photo-link" href="mailto:buse@vt.edu" title="Email" aria-label="Email Buse">
+          <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         </a>
-        <a class="photo-link" href="https://scholar.google.com/citations?user=7EOwQJgAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" title="Google Scholar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        <a class="photo-link" href="https://scholar.google.com/citations?user=7EOwQJgAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" title="Google Scholar" aria-label="Google Scholar profile (opens in a new tab)">
+          <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
         </a>
-        <a class="photo-link" href="https://www.linkedin.com/in/buseçarık/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+        <a class="photo-link" href="https://www.linkedin.com/in/buseçarık/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn profile (opens in a new tab)">
+          <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
         </a>
-        <a class="photo-link" href="#" onclick="showPage('cv'); return false;" title="CV">
+        <a class="photo-link" href="#cv" onclick="showPage('cv'); return false;" aria-label="CV (this site)">
           <span class="photo-link-text">CV</span>
         </a>
       </div>
     </div>
     <div>
-      <h1 class="greeting">Hi, I'm <em>Buse</em> 👋</h1>
-      <p style="font-size:12px;color:var(--text3);font-style:italic;margin-bottom:8px;letter-spacing:0.03em;">Buse (boo-SEH)</p>
+      <h1 class="greeting">Hi, I'm <em>Buse</em></h1>
+      <p class="pronunciation"><span class="visually-hidden">Pronounced </span>(boo-SEH)</p>
       <p class="tagline">PhD Student &middot; Virginia Tech &middot; SAIL Lab</p>
       <p class="bio">
         I'm a 4th year PhD student in Computer Science at Virginia Tech, working with
@@ -589,203 +818,163 @@ footer {
         in the <a href="https://sail.cs.vt.edu/" target="_blank" rel="noopener noreferrer">SAIL Lab</a>.
         My research sits at the intersection of HCI, NLP, and computational social science.
       </p>
-      <!-- <p class="bio bio-note">
-        Outside research, I'm slowly learning the banjo (weekly lessons, no prior music background),
-        knitting, and always on the lookout for good Mediterranean food in Blacksburg.
-      </p>-->
+      <p class="bio">
+        I study how AI shapes the way people communicate, both with one another and with AI systems. My work spans interpersonal communication, emotional support, and collaboration, and much of it centers neurodivergent communities. I combine qualitative and participatory methods with computational analysis, including LLM auditing and multi-agent simulation, to understand people’s experiences with AI, the assumptions these systems make about their users, and the social dynamics that emerge around them.
+      </p>
+      <aside class="job-market" aria-label="Job market announcement">
+        <strong>I'll be on the 2027–2028 academic job market.</strong>
+        I am seeking postdoctoral positions. If you know of a position that might be a good fit, I'd love to hear from you!
+      </aside>
     </div>
   </div>
-
-  <div class="section">
-    <div class="sec-label">Recent updates</div>
+  <aside class="home-updates" aria-labelledby="updates-heading">
+    <h2 class="sec-label" id="updates-heading">Latest updates</h2>
     <div class="news-list">
       <div class="news-row">
-        <span class="news-date">Jun 2026</span>
-        <span class="news-text">Awarded the <b>Pratt Fellowship</b></span>
+        <time class="news-date" datetime="2026-10">Oct 2026</time>
+        <span class="news-text">I'll be in the <b>CSCW 2026 Doctoral Consortium</b>!</span>
       </div>
       <div class="news-row">
-        <span class="news-date">Jun 2026</span>
-        <span class="news-text">I'll be in the <b>CSCW 2026 Doctoral Consortium</b></span>
+        <time class="news-date" datetime="2026-08">Aug 2026</time>
+        <span class="news-text">Paper accepted to <b>EMNLP 2026</b>: <a href="https://arxiv.org/pdf/2608.01017" target="_blank" rel="noopener noreferrer">why LLMs give in to false claims in medical conversations</a>!</span>
       </div>
       <div class="news-row">
-        <span class="news-date">Apr 2026</span>
-        <span class="news-text">New paper alert! <a href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">"Are we writing an advice column for Spock here?" Understanding Stereotypes in AI Advice for Autistic Users</a> <b>CHI 2026</b></span>
+        <time class="news-date" datetime="2026-06">Jun 2026</time>
+        <span class="news-text">Won the <b>Computer Science Scholars and Pratt Fellowship Award</b> for the 2026–27 academic year!</span>
       </div>
       <div class="news-row">
-        <span class="news-date">Apr 2025</span>
-        <span class="news-text">Attending <b>CHI 2025</b> in Yokohama, Japan as a paper presenter 🇯🇵</span>
+        <time class="news-date" datetime="2026-04">Apr 2026</time>
+        <span class="news-text">New at CHI 2026: <a href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">stereotypes in AI advice for autistic users</a>!</span>
       </div>
-      <!-- <div class="news-row">
-        <span class="news-date">Apr 2025</span>
-        <span class="news-text">Paper accepted at <b>CUI 2025</b></span>
-      </div>-->
       <div class="news-row">
-        <span class="news-date">Mar 2025</span>
+        <time class="news-date" datetime="2025-04">Apr 2025</time>
+        <span class="news-text">Attending <b>CHI 2025</b> in Yokohama, Japan as a paper presenter <span aria-hidden="true">🇯🇵</span></span>
+      </div>
+
+      <details class="older-updates"><summary>Older updates</summary>
+      <div class="news-row">
+        <time class="news-date" datetime="2025-03">Mar 2025</time>
         <span class="news-text">Presented at the <b>VTCAR Biennial Spring Conference</b>: Promoting Well-being for Autistic People Across the Lifespan</span>
       </div>
+      </details>
     </div>
+  </aside>
   </div>
-
-  <div class="section">
-    <div class="sec-label">Featured publications</div>
+  <section class="home-research" aria-labelledby="research-heading">
+    <h2 class="sec-label" id="research-heading">Selected research</h2>
     <div class="pub-list">
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/chi2026.jpeg" alt="CHI 2026 teaser">
+          <img class="pub-thumb" src="images/papers/chi2026.jpeg" alt="Study workflow: identify stereotypes, create and expand advice scenarios, then compare LLM advice under stereotype and opposite-trait conditions.">
           <span class="venue-badge">CHI 2026</span>
         </div>
         <div>
-          <div class="pub-title">"Are we writing an advice column for Spock here?" Understanding Stereotypes in AI Advice for Autistic Users</div>
-          <div class="pub-keywords">
-            <span class="pub-kw">LLM bias</span><span class="pub-kw">LLM audit</span><span class="pub-kw">autism</span><span class="pub-kw">interview study</span><span class="pub-kw">AI advice</span>
-          </div>
-          <div class="pub-authors">Caleb Wohn, <b>Buse Çarık</b>, Xiaohan Ding, Sang Won Lee, Young-Ho Kim, Eugenia H. Rho</div>
+          <h3 class="pub-title">"Are we writing an advice column for Spock here?" Understanding Stereotypes in AI Advice for Autistic Users</h3>
+          <p class="pub-summary">Examining how stereotypes shape AI-generated advice for autistic users.</p>
           <div class="pub-links">
-            <a class="pub-link" href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://arxiv.org/pdf/2601.12690" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: &quot;Are we writing an advice column for Spock here?&quot; Understanding Stereotypes in AI Advice for Autistic Users (opens in a new tab)" href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: &quot;Are we writing an advice column for Spock here?&quot; Understanding Stereotypes in AI Advice for Autistic Users (opens in a new tab)" href="https://arxiv.org/pdf/2601.12690" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
       <div class="pub-item">
         <div class="pub-left">
-          <!-- Add teaser: images/papers/chi2025.jpg -->
-          <img
-            class="pub-thumb"
-            src="images/papers/chi2025.jpeg"
-            alt="CHI 2025 paper thumbnail"
-          />
+          <img class="pub-thumb" src="images/papers/chi2025.jpeg" alt="Survey charts compare preferences for AI support with negative self-talk, including support types, conversation structure, and response formats.">
           <span class="venue-badge">CHI 2025</span>
         </div>
         <div>
-          <div class="pub-title">
-              Reimagining Support: Exploring Autistic Individuals' Visions for AI in Coping with Negative Self-Talk
-          </div>
-          <div class="pub-keywords">
-            <span class="pub-kw">negative self-talk</span><span class="pub-kw">mental health</span><span class="pub-kw">large language models</span><span class="pub-kw">autism</span>
-          </div>
-          <div class="pub-authors"><b>Buse Çarık</b>, Victoria Izaac, Xiaohan Ding, Angela Scarpa, Eugenia H. Rho</div>
+          <h3 class="pub-title">Reimagining Support: Exploring Autistic Individuals' Visions for AI in Coping with Negative Self-Talk</h3>
+          <p class="pub-summary">Exploring what autistic people want from AI tools for coping with negative self-talk.</p>
           <div class="pub-links">
-            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: Reimagining Support: Exploring Autistic Individuals' Visions for AI in Coping with Negative Self-Talk (opens in a new tab)" href="https://dl.acm.org/doi/abs/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: Reimagining Support: Exploring Autistic Individuals' Visions for AI in Coping with Negative Self-Talk (opens in a new tab)" href="https://dl.acm.org/doi/pdf/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/group2025.jpeg" alt="GROUP 2025 teaser">
+          <img class="pub-thumb" src="images/papers/group2025.jpeg" alt="Table compares reported LLM uses across autism, social anxiety, ADHD, and dyslexia communities, including emotional support and interpersonal communication.">
           <span class="venue-badge">GROUP 2025</span>
         </div>
         <div>
-          <div class="pub-title">Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns</div>
-          <div class="pub-keywords">
-            <span class="pub-kw">large language models</span><span class="pub-kw">neurodivergent communities</span><span class="pub-kw">Reddit</span><span class="pub-kw">community workarounds</span>
-          </div>
-          <div class="pub-authors"><b>Buse Çarık</b>, Kaike Ping, Xiaohan Ding, Eugenia H. Rho</div>
+          <h3 class="pub-title">Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns</h3>
+          <p class="pub-summary">Understanding how neurodivergent communities use, adapt, and experience large language models.</p>
           <div class="pub-links">
-            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3701194" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3701194" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns (opens in a new tab)" href="https://dl.acm.org/doi/abs/10.1145/3701194" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns (opens in a new tab)" href="https://dl.acm.org/doi/pdf/10.1145/3701194" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
     </div>
-    <a class="more-link" href="#" onclick="showPage('publications')">View all publications →</a>
-  </div>
-
-
+    <a class="more-link" href="#publications" onclick="showPage('publications'); return false;">View all publications <span aria-hidden="true">→</span></a>
+  </section>
 </div>
 
-<!-- ═══════════════ RESEARCH (removed from nav, kept for reference) ═══════════════ -->
-<div class="page" id="page-research" style="display:none !important">
+<!-- ═══════════════ RESEARCH ═══════════════ -->
+<div class="page" id="page-research">
   <h1 class="page-title">Research</h1>
-  <div class="research-card">
-    <span class="research-tag">Active · IRB #25-331</span>
-    <div class="research-title">Autistic–Neurotypical Conversational Dynamics (AT-NT Study)</div>
-    <p class="research-desc">
-      A mixed-methods study examining how autistic and neurotypical individuals communicate
-      in text-based conversations and how they perceive those interactions. Participants are
-      matched into autistic–autistic, autistic–neurotypical, and neurotypical–neurotypical
-      dyads and complete structured chat sessions followed by annotation of their own
-      conversational moves. The study aims to surface communication asymmetries and
-      design implications for AI-mediated communication support tools.
-    </p>
-    <div class="tags-row" style="margin-top:14px;margin-bottom:0;">
-      <span class="interest-tag">HCI</span>
-      <span class="interest-tag">Mixed Methods</span>
-      <span class="interest-tag">Conversation Analysis</span>
-      <span class="interest-tag">Autism</span>
-    </div>
-    <div class="research-meta">
-      <div class="research-meta-item">Platform: <span>Chat-and-Annotate (custom Nuxt + SQLite)</span></div>
-      <div class="research-meta-item">Recruitment: <span>SPARK Registry</span></div>
-    </div>
-  </div>
 
-  <div class="research-card">
-    <span class="research-tag">In progress</span>
-    <div class="research-title">AI Receptivity and Emotion Regulation in Autistic Adults (EmotionAIze)</div>
-    <p class="research-desc">
-      A survey and computational study exploring what predicts autistic adults' openness
-      to using AI tools for emotion regulation. Findings show that reappraisal ability
-      and difficulties in emotion regulation independently predict AI receptivity, while
-      safety and comprehension concerns act as a separate gatekeeping factor. The work
-      surfaces distinct communication style profiles and examines how AI design preferences
-      vary across them.
-    </p>
-    <div class="tags-row" style="margin-top:14px;margin-bottom:0;">
-      <span class="interest-tag">Survey</span>
-      <span class="interest-tag">NLP</span>
-      <span class="interest-tag">Regression Modeling</span>
-      <span class="interest-tag">Emotion Regulation</span>
+  <article class="rp-item">
+    <img class="rp-img" src="images/papers/at-nt.png" alt="Annotation interface from the dyadic study: one partner labels a highlighted conversation moment with what stood out to them, while the other partner reviews the conversation and highlights moments." loading="lazy">
+    <div class="rp-body">
+      <h2 class="rp-title">Conversational Dynamics Between Autistic and Neurotypical Individuals<span class="rp-status">Ongoing</span></h2>
+      <p class="rp-desc">We examine how autistic and neurotypical adults communicate and experience conversations with partners of the same or different neurotypes. Through real-time text-based conversations across autistic–autistic, autistic–neurotypical, and neurotypical–neurotypical pairs, we investigate mutual understanding, rapport, and conversational difficulties. Participants also reflect on specific moments in their conversations, allowing us to explore how people interpret and experience the same interaction.</p>
+      <div class="rp-tags"><span class="rp-tag">Interpersonal Communication</span><span class="rp-tag">Computer-Mediated Communication</span><span class="rp-tag">Neurodiversity</span><span class="rp-tag">Social Interaction</span></div>
     </div>
-    <div class="research-meta">
-      <div class="research-meta-item">Target venue: <span>TOCHI</span></div>
-    </div>
-  </div>
+  </article>
 
-  <div class="research-card">
-    <span class="research-tag">Published · CHI 2025</span>
-    <div class="research-title">Multimodal AI Tools for Coping with Negative Self-Talk</div>
-    <p class="research-desc">
-      Qualitative focus group research exploring how autistic adults envision using
-      AI tools to cope with negative self-talk. Through participatory sessions, we
-      surfaced design visions that center neurodivergent experience — including preferences
-      for non-judgmental, customizable, and transparent AI interactions. The work
-      informs participatory design principles for mental health AI.
-    </p>
-    <div class="tags-row" style="margin-top:14px;margin-bottom:0;">
-      <span class="interest-tag">Focus Groups</span>
-      <span class="interest-tag">Participatory Design</span>
-      <span class="interest-tag">Mental Health</span>
-      <span class="interest-tag">Thematic Analysis</span>
+  <article class="rp-item">
+    <img class="rp-img" src="images/papers/llm-mas.png" alt="Dashboard for an LLM multi-agent deliberation: four agents with private and shared knowledge reach a unanimous group decision, with opinion evolution over turns and participation bars." loading="lazy">
+    <div class="rp-body">
+      <h2 class="rp-title">Emergent Leadership in LLM Multi-Agent Systems<span class="rp-status">Ongoing</span></h2>
+      <p class="rp-desc">We investigate how leadership emerges when LLM agents collaborate on group decision-making tasks without predefined leaders. Using hidden-profile tasks in which agents possess different pieces of information, we examine how they share and integrate information, influence one another, and reach collective decisions. Our goal is to understand the conversational and collaborative dynamics through which agents take on leadership roles.</p>
+      <div class="rp-tags"><span class="rp-tag">LLM Multi-Agent Systems</span><span class="rp-tag">Emergent Leadership</span><span class="rp-tag">Human–AI Collaboration</span><span class="rp-tag">Group Decision-Making</span></div>
     </div>
-    <div class="research-meta">
-      <div class="research-meta-item">Venue: <span>ACM CHI 2025, Yokohama</span></div>
-    </div>
-  </div>
+  </article>
 
-  <div class="research-card">
-    <span class="research-tag">Published · CHI 2024</span>
-    <div class="research-title">LLM Use in Neurodivergent Communities</div>
-    <p class="research-desc">
-      A computational social science study of how neurodivergent Reddit communities
-      adopted and adapted ChatGPT — including prompt-sharing practices, community-driven
-      workarounds, and expressed concerns. This work connects community-level AI adoption
-      to accessibility and neurodiversity scholarship.
-    </p>
-    <div class="tags-row" style="margin-top:14px;margin-bottom:0;">
-      <span class="interest-tag">Computational</span>
-      <span class="interest-tag">NLP</span>
-      <span class="interest-tag">Reddit Corpus</span>
-      <span class="interest-tag">Neurodiversity</span>
+  <article class="rp-item">
+    <img class="rp-img" src="images/papers/multimodal.png" alt="Multimodal AI support prototypes: visual sketch-to-image and animation, auditory custom sound generation, an embodied robot, and tactile weighted scarf and vibrotactile vest." loading="lazy">
+    <div class="rp-body">
+      <h2 class="rp-title">Designing Multimodal AI Support for Negative Self-Talk<span class="rp-status">Under review</span></h2>
+      <p class="rp-desc">We conducted four participatory focus groups with 12 autistic adults to explore how AI could support people experiencing negative self-talk. Participants engaged with visual, auditory, tactile, and embodied technologies, including a social robot and vibrotactile devices, and developed their own ideas for AI support. We examined how they envisioned combining different modalities, maintaining control over AI interactions, and incorporating support into everyday situations.</p>
+      <div class="rp-tags"><span class="rp-tag">Human–AI Interaction</span><span class="rp-tag">Participatory Design</span><span class="rp-tag">Multimodal Interaction</span><span class="rp-tag">Autism</span><span class="rp-tag">Mental Health</span></div>
     </div>
-    <div class="research-meta">
-      <div class="research-meta-item">Venue: <span>ACM CHI 2024</span></div>
+  </article>
+
+  <article class="rp-item">
+    <img class="rp-img" src="images/papers/chi2025.jpeg" alt="Survey charts compare preferences for AI support with negative self-talk, including support types, conversation structure, and response formats." loading="lazy">
+    <div class="rp-body">
+      <h2 class="rp-title">Autistic Adults' Perspectives on LLM Support for Negative Self-Talk<span class="rp-status">CHI 2025</span></h2>
+      <p class="rp-desc">We surveyed autistic adults to understand how they envision using LLMs to manage negative self-talk and what shapes their willingness to seek AI-based support. We examined preferred forms of support, challenges in communicating their needs through prompts, and concerns about privacy, safety, and neurotypical assumptions embedded in LLM responses. Our findings highlight opportunities and barriers for making AI-based emotional support more responsive to autistic individuals' needs.</p>
+      <div class="rp-tags"><span class="rp-tag">LLMs</span><span class="rp-tag">Autism</span><span class="rp-tag">Emotional Support</span><span class="rp-tag">Negative Self-Talk</span><span class="rp-tag">Human–AI Interaction</span></div>
+      <div class="rp-links"><a href="https://dl.acm.org/doi/abs/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer" aria-label="Paper: Autistic Adults' Perspectives on LLM Support for Negative Self-Talk (opens in a new tab)">[Paper]</a></div>
     </div>
-  </div>
+  </article>
+
+  <article class="rp-item">
+    <img class="rp-img" src="images/papers/group2025-table.png" alt="Table of LLM use cases by thematic area, such as emotional well-being, mental health support, and interpersonal communication, compared across autism, social anxiety, ADHD, and dyslexia communities." loading="lazy">
+    <div class="rp-body">
+      <h2 class="rp-title">LLM Use in Neurodivergent Communities<span class="rp-status">GROUP 2025</span></h2>
+      <p class="rp-desc">We analyzed more than 55,000 Reddit posts and comments to understand how neurodivergent communities use and experience LLMs in everyday life. We identified uses ranging from emotional support to interpreting social situations and navigating interpersonal communication, alongside challenges involving neurotypical assumptions and responses that do not reflect users' intended voices. We also examined the workarounds community members develop to adapt these systems to their needs.</p>
+      <div class="rp-tags"><span class="rp-tag">LLMs</span><span class="rp-tag">Neurodiversity</span><span class="rp-tag">Online Communities</span><span class="rp-tag">Human–AI Interaction</span><span class="rp-tag">Social Computing</span></div>
+      <div class="rp-links"><a href="https://dl.acm.org/doi/abs/10.1145/3701194" target="_blank" rel="noopener noreferrer" aria-label="Paper: LLM Use in Neurodivergent Communities (opens in a new tab)">[Paper]</a></div>
+    </div>
+  </article>
+
+  <article class="rp-item">
+    <img class="rp-img" src="images/papers/hate-speech.png" alt="Bar chart of coefficients for message types, with sarcasm, warnings of consequences, and accusation negative and acknowledgement positive." loading="lazy">
+    <div class="rp-body">
+      <h2 class="rp-title">Why People Do or Do Not Respond to Hate Speech Online<span class="rp-status">TOCHI 2025</span></h2>
+      <p class="rp-desc">We surveyed hundreds of participants to investigate what motivates people to respond to hate speech online and what prevents them from speaking up. We found that individuals targeted by hate speech were more likely to respond, while younger individuals, women, and frequent witnesses reported greater hesitation, particularly due to fears of retaliation. These findings reveal how personal experiences and perceived risks shape responses to online hate.</p>
+      <div class="rp-tags"><span class="rp-tag">Social Computing</span><span class="rp-tag">Online Hate Speech</span><span class="rp-tag">Bystander Behavior</span><span class="rp-tag">Online Safety</span></div>
+      <!-- TODO: add the paper link (and a figure image) for the TOCHI 2025 hate speech paper. -->
+      <div class="rp-links"><span class="link-pending">[Paper: link coming soon]</span></div>
+    </div>
+  </article>
 
 </div>
 
@@ -795,23 +984,60 @@ footer {
   <!-- <p class="page-subtitle" style="margin-bottom: 36px;">* denotes equal contribution</p> -->
 
   <div class="year-group">
-    <div class="year-label">2026</div>
+    <h2 class="year-label">2026</h2>
     <div class="pub-list">
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/chi2026.jpeg" alt="CHI 2026 teaser">
+          <img class="pub-thumb" src="images/papers/emnlp2026.png" alt="Study design diagram: a fully crossed design of user role, user evidence, interaction structure, and grounding yields 48 conversational conditions for measuring medical sycophancy in language models.">
+          <span class="venue-badge">EMNLP 2026</span>
+        </div>
+        <div>
+          <h3 class="pub-title">Why LLMs Give In: Conversational Factors and Reasoning Behind Medical Sycophancy</h3>
+          <div class="pub-keywords">
+            <span class="pub-kw">LLM sycophancy</span><span class="pub-kw">medical advice</span><span class="pub-kw">conversational factors</span><span class="pub-kw">NLP</span>
+          </div>
+          <div class="pub-authors">Kaike Ping, <b>Buse Çarık</b>, Caleb Wohn, Xiaohan Ding, Tongshuai Wang, Eugenia H. Rho</div>
+          <div class="pub-links">
+            <a class="pub-link" aria-label="Paper: Why LLMs Give In: Conversational Factors and Reasoning Behind Medical Sycophancy (opens in a new tab)" href="https://arxiv.org/pdf/2608.01017" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: Why LLMs Give In: Conversational Factors and Reasoning Behind Medical Sycophancy (opens in a new tab)" href="https://arxiv.org/pdf/2608.01017" target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/dc2026.png" alt="Overview of two dissertation studies: a study of conversations among autistic and neurotypical adults, and a planned evaluation of how well LLM interpretations align with participants' own annotations across neurotypes.">
+          <span class="venue-badge">CSCW 2026 DC</span>
+        </div>
+        <div>
+          <h3 class="pub-title">Neurotypical Assumptions in Large Language Models Across Individual Support and Interpersonal Communication</h3>
+          <div class="pub-keywords">
+            <span class="pub-kw">doctoral consortium</span><span class="pub-kw">neurodiversity</span><span class="pub-kw">large language models</span><span class="pub-kw">interpersonal communication</span>
+          </div>
+          <div class="pub-authors"><b>Buse Çarık</b></div>
+          <div class="pub-venue-note">Companion Publication of CSCW 2026, Doctoral Consortium</div>
+          <!-- TODO: replace href="#" with the real link once the DC paper is published (add a PDF link too). -->
+          <div class="pub-links">
+            <span class="pub-link link-pending">Paper (coming soon)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item">
+        <div class="pub-left">
+          <img class="pub-thumb" src="images/papers/chi2026.jpeg" alt="Study workflow: identify stereotypes, create and expand advice scenarios, then compare LLM advice under stereotype and opposite-trait conditions.">
           <span class="venue-badge">CHI 2026</span>
         </div>
         <div>
-          <div class="pub-title">"Are we writing an advice column for Spock here?" Understanding Stereotypes in AI Advice for Autistic Users</div>
+          <h3 class="pub-title">"Are we writing an advice column for Spock here?" Understanding Stereotypes in AI Advice for Autistic Users</h3>
           <div class="pub-keywords">
             <span class="pub-kw">LLM bias</span><span class="pub-kw">LLM audit</span><span class="pub-kw">autism</span><span class="pub-kw">interview study</span><span class="pub-kw">AI advice</span>
           </div>
           <div class="pub-authors">Caleb Wohn, <b>Buse Çarık</b>, Xiaohan Ding, Sang Won Lee, Young-Ho Kim, Eugenia H. Rho</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://arxiv.org/pdf/2601.12690" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: &quot;Are we writing an advice column for Spock here?&quot; Understanding Stereotypes in AI Advice for Autistic Users (opens in a new tab)" href="https://arxiv.org/abs/2601.12690" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: &quot;Are we writing an advice column for Spock here?&quot; Understanding Stereotypes in AI Advice for Autistic Users (opens in a new tab)" href="https://arxiv.org/pdf/2601.12690" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
@@ -820,97 +1046,97 @@ footer {
   </div>
 
   <div class="year-group">
-    <div class="year-label">2025</div>
+    <h2 class="year-label">2025</h2>
     <div class="pub-list">
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/chi2025.jpeg" alt="CHI 2025 teaser">
+          <img class="pub-thumb" src="images/papers/chi2025.jpeg" alt="Survey charts compare preferences for AI support with negative self-talk, including support types, conversation structure, and response formats.">
           <span class="venue-badge">CHI 2025</span>
         </div>
         <div>
-          <div class="pub-title">
+          <h3 class="pub-title">
               Reimagining Support: Exploring Autistic Individuals' Visions for AI in Coping with Negative Self-Talk
-          </div>
+          </h3>
           <div class="pub-keywords">
             <span class="pub-kw">negative self-talk</span><span class="pub-kw">mental health</span><span class="pub-kw">large language models</span><span class="pub-kw">autism</span>
           </div>
           <div class="pub-authors"><b>Buse Çarık</b>, Victoria Izaac, Xiaohan Ding, Angela Scarpa, Eugenia H. Rho</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: Reimagining Support: Exploring Autistic Individuals&#x27; Visions for AI in Coping with Negative Self-Talk (opens in a new tab)" href="https://dl.acm.org/doi/abs/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: Reimagining Support: Exploring Autistic Individuals&#x27; Visions for AI in Coping with Negative Self-Talk (opens in a new tab)" href="https://dl.acm.org/doi/pdf/10.1145/3706598.3714287" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/group2025.jpeg" alt="GROUP 2025 teaser">
+          <img class="pub-thumb" src="images/papers/group2025.jpeg" alt="Table compares reported LLM uses across autism, social anxiety, ADHD, and dyslexia communities, including emotional support and interpersonal communication.">
           <span class="venue-badge">GROUP 2025</span>
         </div>
         <div>
-          <div class="pub-title">Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns</div>
+          <h3 class="pub-title">Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns</h3>
           <div class="pub-keywords">
             <span class="pub-kw">large language models</span><span class="pub-kw">neurodivergent communities</span><span class="pub-kw">Reddit</span><span class="pub-kw">community workarounds</span>
           </div>
           <div class="pub-authors"><b>Buse Çarık</b>, Kaike Ping, Xiaohan Ding, Eugenia H. Rho</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3701194" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3701194" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns (opens in a new tab)" href="https://dl.acm.org/doi/abs/10.1145/3701194" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: Exploring Large Language Models Through a Neurodivergent Lens: Use, Challenges, Community-Driven Workarounds, and Concerns (opens in a new tab)" href="https://dl.acm.org/doi/pdf/10.1145/3701194" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/cui2025.jpeg" alt="CUI 2025 teaser">
+          <img class="pub-thumb" src="images/papers/cui2025.jpeg" alt="AI coaching workflow: choose a scenario, practice a conversation, receive feedback, and revise responses with an AI coach.">
           <span class="venue-badge">CUI 2025</span>
         </div>
         <div>
-          <div class="pub-title">How Managers Perceive AI-Assisted Conversational Training for Workplace Communication</div>
+          <h3 class="pub-title">How Managers Perceive AI-Assisted Conversational Training for Workplace Communication</h3>
           <div class="pub-keywords">
             <span class="pub-kw">conversational AI</span><span class="pub-kw">workplace communication</span><span class="pub-kw">AI training</span><span class="pub-kw">manager perceptions</span><span class="pub-kw">CUI</span>
           </div>
           <div class="pub-authors">Lance T. Wilhelm, Xiaohan Ding, Kirk McInnis Knutsen, <b>Buse Çarık</b>, Eugenia H. Rho</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3719160.3736639" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3719160.3736639" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: How Managers Perceive AI-Assisted Conversational Training for Workplace Communication (opens in a new tab)" href="https://dl.acm.org/doi/abs/10.1145/3719160.3736639" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: How Managers Perceive AI-Assisted Conversational Training for Workplace Communication (opens in a new tab)" href="https://dl.acm.org/doi/pdf/10.1145/3719160.3736639" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/emnlp2025.jpeg" alt="EMNLP 2025 teaser">
+          <img class="pub-thumb" src="images/papers/emnlp2025.jpeg" alt="Table compares causal gist generation across language models using ROUGE and BERTScore; zero-shot Gemini leads ROUGE-2, ROUGE-L, and BERTScore.">
           <span class="venue-badge">EMNLP 2025</span>
         </div>
         <div>
-          <div class="pub-title">A Multi-Level Benchmark for Causal Language Understanding in Social Media Discourse</div>
+          <h3 class="pub-title">A Multi-Level Benchmark for Causal Language Understanding in Social Media Discourse</h3>
           <div class="pub-keywords">
             <span class="pub-kw">causal language</span><span class="pub-kw">benchmark</span><span class="pub-kw">social media</span><span class="pub-kw">NLP</span><span class="pub-kw">causal reasoning</span>
           </div>
           <div class="pub-authors">Xiaohan Ding, Kaike Ping, <b>Buse Çarık</b>, Eugenia H. Rho</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://aclanthology.org/2025.emnlp-main.1464/" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://aclanthology.org/2025.emnlp-main.1464.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: A Multi-Level Benchmark for Causal Language Understanding in Social Media Discourse (opens in a new tab)" href="https://aclanthology.org/2025.emnlp-main.1464/" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: A Multi-Level Benchmark for Causal Language Understanding in Social Media Discourse (opens in a new tab)" href="https://aclanthology.org/2025.emnlp-main.1464.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/vlhcc2025.jpeg" alt="VL/HCC 2025 teaser">
+          <img class="pub-thumb" src="images/papers/vlhcc2025.jpeg" alt="CounterQuill workflow: highlight hateful content, reflect on feedback, draft counterspeech, and revise with AI assistance.">
           <span class="venue-badge">VL/HCC 2025</span>
         </div>
         <div>
-          <div class="pub-title">Designing Human-AI Collaboration to Support Learning in Counterspeech Writing</div>
+          <h3 class="pub-title">Designing Human-AI Collaboration to Support Learning in Counterspeech Writing</h3>
           <div class="pub-keywords">
             <span class="pub-kw">counterspeech</span><span class="pub-kw">human-AI collaboration</span><span class="pub-kw">hate speech</span><span class="pub-kw">writing support</span><span class="pub-kw">online safety</span>
           </div>
           <div class="pub-authors">Xiaohan Ding, Kaike Ping, Uma Sushmitha Gunturi, <b>Buse Çarık</b>, Sophia Stil, Lance T. Wilhelm, Taufiq Daryanto, James Hawdon, Sang Won Lee, Eugenia H. Rho</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://ieeexplore.ieee.org/abstract/document/11303530/" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://ieeexplore.ieee.org/iel8/11303452/11303453/11303530.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: Designing Human-AI Collaboration to Support Learning in Counterspeech Writing (opens in a new tab)" href="https://ieeexplore.ieee.org/abstract/document/11303530/" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: Designing Human-AI Collaboration to Support Learning in Counterspeech Writing (opens in a new tab)" href="https://ieeexplore.ieee.org/iel8/11303452/11303453/11303530.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
@@ -919,23 +1145,23 @@ footer {
   </div>
 
   <div class="year-group">
-    <div class="year-label">2024</div>
+    <h2 class="year-label">2024</h2>
     <div class="pub-list">
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/chi2024.jpeg" alt="CHI 2024 teaser">
+          <img class="pub-thumb" src="images/papers/chi2024.jpeg" alt="Research workflow connects Reddit data collection, GPT-4 gist generation, and Granger causality analysis of community behavior and health outcomes.">
           <span class="venue-badge">CHI 2024</span>
         </div>
         <div>
-          <div class="pub-title">Leveraging Prompt-Based Large Language Models: Predicting Pandemic Health Decisions and Outcomes Through Social Media Language</div>
+          <h3 class="pub-title">Leveraging Prompt-Based Large Language Models: Predicting Pandemic Health Decisions and Outcomes Through Social Media Language</h3>
           <div class="pub-keywords">
             <span class="pub-kw">LLMs</span><span class="pub-kw">public health</span><span class="pub-kw">social media</span><span class="pub-kw">pandemic</span><span class="pub-kw">decision-making</span>
           </div>
           <div class="pub-authors">Xiaohan Ding, <b>Buse Çarık</b>, Uma Gunturi, Valerie Reyna, Eugenia H. Rho</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://dl.acm.org/doi/abs/10.1145/3613904.3642117" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://dl.acm.org/doi/pdf/10.1145/3613904.3642117" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: Leveraging Prompt-Based Large Language Models: Predicting Pandemic Health Decisions and Outcomes Through Social Media Language (opens in a new tab)" href="https://dl.acm.org/doi/abs/10.1145/3613904.3642117" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: Leveraging Prompt-Based Large Language Models: Predicting Pandemic Health Decisions and Outcomes Through Social Media Language (opens in a new tab)" href="https://dl.acm.org/doi/pdf/10.1145/3613904.3642117" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
@@ -944,58 +1170,58 @@ footer {
   </div>
 
   <div class="year-group">
-    <div class="year-label">2022</div>
+    <h2 class="year-label">2022</h2>
     <div class="pub-list">
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/lrec2022_ner.jpeg" alt="LREC 2022 NER teaser">
+          <img class="pub-thumb" src="images/papers/lrec2022_ner.jpeg" alt="Tables compare transformer models for named entity recognition and training on formal versus informal text; BERT models achieve the highest listed test F1 scores.">
           <span class="venue-badge">LREC 2022</span>
         </div>
         <div>
-          <div class="pub-title">A Twitter Corpus for Named Entity Recognition in Turkish</div>
+          <h3 class="pub-title">A Twitter Corpus for Named Entity Recognition in Turkish</h3>
           <div class="pub-keywords">
             <span class="pub-kw">named entity recognition</span><span class="pub-kw">Turkish NLP</span><span class="pub-kw">Twitter corpus</span><span class="pub-kw">low-resource NLP</span>
           </div>
           <div class="pub-authors"><b>Buse Çarık</b>, Reyyan Yeniterzi</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://aclanthology.org/2022.lrec-1.484/" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://aclanthology.org/2022.lrec-1.484.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: A Twitter Corpus for Named Entity Recognition in Turkish (opens in a new tab)" href="https://aclanthology.org/2022.lrec-1.484/" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: A Twitter Corpus for Named Entity Recognition in Turkish (opens in a new tab)" href="https://aclanthology.org/2022.lrec-1.484.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/lrec2022_hate.jpeg" alt="LREC 2022 Hate Speech teaser">
+          <img class="pub-thumb" src="images/papers/lrec2022_hate.jpeg" alt="Results table compares baseline and proposed hate-speech classification on Istanbul Convention and refugee datasets; the proposed approach improves the listed F1 scores.">
           <span class="venue-badge">LREC 2022</span>
         </div>
         <div>
-          <div class="pub-title">A Turkish Hate Speech Dataset and Detection System</div>
+          <h3 class="pub-title">A Turkish Hate Speech Dataset and Detection System</h3>
           <div class="pub-keywords">
             <span class="pub-kw">hate speech detection</span><span class="pub-kw">Turkish NLP</span><span class="pub-kw">dataset</span><span class="pub-kw">offensive language</span>
           </div>
           <div class="pub-authors">Fatih Beyhan, <b>Buse Çarık</b>, İnanç Arın, Ayşecan Terzioğlu, Berrin Yanıkoğlu, Reyyan Yeniterzi</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://aclanthology.org/2022.lrec-1.443.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="PDF: A Turkish Hate Speech Dataset and Detection System (opens in a new tab)" href="https://aclanthology.org/2022.lrec-1.443.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/semeval2022.jpeg" alt="SemEval 2022 teaser">
+          <img class="pub-thumb" src="images/papers/semeval2022.jpeg" alt="Named entity recognition pipeline retrieves candidate documents, links mentions, and classifies entity types using the retrieved context.">
           <span class="venue-badge">SemEval 2022</span>
         </div>
         <div>
-          <div class="pub-title"><a href="https://aclanthology.org/2022.semeval-1.227/" target="_blank" rel="noopener noreferrer">SU-NLP at SemEval-2022 Task 11: Complex Named Entity Recognition with Entity Linking</a></div>
+          <h3 class="pub-title"><a href="https://aclanthology.org/2022.semeval-1.227/" target="_blank" rel="noopener noreferrer">SU-NLP at SemEval-2022 Task 11: Complex Named Entity Recognition with Entity Linking</a></h3>
           <div class="pub-keywords">
             <span class="pub-kw">named entity recognition</span><span class="pub-kw">entity linking</span><span class="pub-kw">MultiCoNER</span><span class="pub-kw">Turkish NLP</span><span class="pub-kw">Wikipedia</span>
           </div>
           <div class="pub-authors"><b>Buse Çarık</b>, Fatih Beyhan, Reyyan Yeniterzi</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://aclanthology.org/2022.semeval-1.227/" target="_blank" rel="noopener noreferrer">Paper</a>
-            <a class="pub-link" href="https://aclanthology.org/2022.semeval-1.227.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="Paper: SU-NLP at SemEval-2022 Task 11: Complex Named Entity Recognition with Entity Linking (opens in a new tab)" href="https://aclanthology.org/2022.semeval-1.227/" target="_blank" rel="noopener noreferrer">Paper</a>
+            <a class="pub-link" aria-label="PDF: SU-NLP at SemEval-2022 Task 11: Complex Named Entity Recognition with Entity Linking (opens in a new tab)" href="https://aclanthology.org/2022.semeval-1.227.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
@@ -1004,22 +1230,22 @@ footer {
   </div>
 
   <div class="year-group">
-    <div class="year-label">2021</div>
+    <h2 class="year-label">2021</h2>
     <div class="pub-list">
 
       <div class="pub-item">
         <div class="pub-left">
-          <img class="pub-thumb" src="images/papers/clef2021.jpeg" alt="CLEF 2021 teaser">
+          <img class="pub-thumb" src="images/papers/clef2021.jpeg" alt="Tables compare BERTurk random seeds and ensemble results; the ensemble has the highest listed validation MAP, while BERTurk_1 leads validation macro-F1.">
           <span class="venue-badge">CLEF 2021</span>
         </div>
         <div>
-          <div class="pub-title">SU-NLP at CheckThat! 2021: Check-Worthiness of Turkish Tweets</div>
+          <h3 class="pub-title">SU-NLP at CheckThat! 2021: Check-Worthiness of Turkish Tweets</h3>
           <div class="pub-keywords">
             <span class="pub-kw">fact-checking</span><span class="pub-kw">check-worthiness</span><span class="pub-kw">Turkish NLP</span><span class="pub-kw">BERT</span><span class="pub-kw">misinformation</span>
           </div>
           <div class="pub-authors"><b>Buse Çarık</b>, Reyyan Yeniterzi</div>
           <div class="pub-links">
-            <a class="pub-link" href="https://www.academia.edu/download/76252766/paper-37.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
+            <a class="pub-link" aria-label="PDF: SU-NLP at CheckThat! 2021: Check-Worthiness of Turkish Tweets (opens in a new tab)" href="https://www.academia.edu/download/76252766/paper-37.pdf" target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
       </div>
@@ -1035,126 +1261,437 @@ footer {
   <a class="cv-download" href="assets/CV.pdf" target="_blank" rel="noopener noreferrer">
     ↓ Download full CV (PDF)
   </a>
+  <p class="cv-note">The full CV is also on this page as accessible text. The PDF is best for printing.</p>
 
   <div class="cv-section">
-    <div class="cv-section-title">Education</div>
+    <h2 class="cv-section-title">Education</h2>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">PhD in Computer Science, Virginia Tech</span>
-        <span class="cv-item-date">2022 – Expected 2027</span>
+        <span class="cv-item-title">Ph.D., Computer Science, Virginia Tech</span>
+        <span class="cv-item-date">2023 – 2027 (expected)</span>
       </div>
-      <div class="cv-item-sub">Advised by Dr. Eugenia Rho · SAIL Lab</div>
+      <div class="cv-item-sub">Advisor: Dr. Eugenia H. Rho · SAIL Lab</div>
     </div>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">MS in Computer Science, Sabanci University</span>
-        <span class="cv-item-date">Dec 2022</span>
+        <span class="cv-item-title">M.Sc., Computer Science, Sabancı University</span>
+        <span class="cv-item-date">2020 – 2022</span>
       </div>
-      <div class="cv-item-sub">Advised by Dr. Reyyan Yeniterzi</div>
+      <div class="cv-item-sub">Advisor: Dr. Reyyan Yeniterzi</div>
     </div>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">BS in Computer Science, Sabanci University</span>
-        <span class="cv-item-date">Jun 2020</span>
+        <span class="cv-item-title">B.Sc., Computer Science, Sabancı University</span>
+        <span class="cv-item-date">2015 – 2020</span>
       </div>
       <div class="cv-item-sub">Minor in Psychology</div>
     </div>
   </div>
 
   <div class="cv-section">
-    <div class="cv-section-title">Awards &amp; Honors</div>
+    <h2 class="cv-section-title">Honors, Awards &amp; Recognitions</h2>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">VTCAR Student Fellowship</span>
+        <span class="cv-item-title">Pratt Fellowship, Virginia Tech</span>
+        <span class="cv-item-date">Sep 2026 – May 2027</span>
+      </div>
+      <div class="cv-item-sub">Additional stipend funding totaling $805</div>
+      <div class="cv-item-detail">Awarded for academic excellence and research contributions in graduate studies</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">ACM CSCW Doctoral Consortium</span>
+        <span class="cv-item-date">Oct 2026</span>
+      </div>
+      <div class="cv-item-sub">Selected to present dissertation research at CSCW 2026</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Virginia Tech Graduate Student Conference Award</span>
+        <span class="cv-item-date">Sep 2025</span>
+      </div>
+      <div class="cv-item-sub">Additional stipend funding totaling $750</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Virginia Tech CHCI Conference Travel Grant</span>
+        <span class="cv-item-date">May 2024</span>
+      </div>
+      <div class="cv-item-sub">Additional stipend funding totaling $300</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">VTCAR Student Award, VT Autism Clinic &amp; Center for Autism Research</span>
         <span class="cv-item-date">2024</span>
       </div>
-      <div class="cv-item-sub">Virginia Tech Center for Autism Research</div>
-      <div class="cv-item-detail">Awarded for research proposal: Developing Human-AI Interaction Strategies to Support Autistic Adults in Coping with Negative Self-Talk</div>
+      <div class="cv-item-sub">Research funding totaling $500</div>
+      <div class="cv-item-detail">Awarded to fund research on designing neuro-affirming human–AI interactions for coping with negative self-talk in autistic adults</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">TÜBİTAK Research Scholarship</span>
+        <span class="cv-item-date">Mar 2020 – 2022</span>
+      </div>
+      <div class="cv-item-sub">Monthly research stipend</div>
+      <div class="cv-item-detail">Awarded by the Scientific and Technological Research Council of Türkiye as a researcher</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Sabancı University Graduate Scholarship</span>
+        <span class="cv-item-date">Sep 2020 – 2022</span>
+      </div>
+      <div class="cv-item-sub">100% tuition scholarship</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Dean's List, Sabancı University</span>
+        <span class="cv-item-date">2015 – 2020</span>
+      </div>
+      <div class="cv-item-sub">Academic excellence</div>
     </div>
   </div>
 
   <div class="cv-section">
-    <div class="cv-section-title">Teaching &amp; Service</div>
+    <h2 class="cv-section-title">Datasets &amp; Software</h2>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">Graduate Teaching Assistant</span>
-        <span class="cv-item-date">2020 – Present</span>
+        <span class="cv-item-title">Chat-and-Annotate Platform</span>
+        <span class="cv-item-date">2026</span>
       </div>
-      <div class="cv-item-sub">Virginia Tech · Introductory AI course</div>
+      <div class="cv-item-sub">Web platform for real-time dyadic text conversations with message-level annotation</div>
+      <div class="cv-item-detail">Currently being used to collect a participant-annotated corpus of 150 dyadic conversations</div>
     </div>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">Event Coordinator</span>
-        <span class="cv-item-date">Ongoing</span>
+        <span class="cv-item-title">Turkish Twitter NER Corpus</span>
+        <span class="cv-item-date">2022</span>
       </div>
-      <div class="cv-item-sub">Center for Human-Computer Interaction (CHCI), Virginia Tech</div>
+      <div class="cv-item-sub">5,000 Turkish tweets annotated for named entities, released with training scripts</div>
+      <div class="cv-item-detail">Released with <a href="https://aclanthology.org/2022.lrec-1.484/" target="_blank" rel="noopener noreferrer">A Twitter Corpus for Named Entity Recognition in Turkish</a> (LREC 2022)</div>
     </div>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">Undergraduate Research Mentor</span>
-        <span class="cv-item-date">Ongoing</span>
+        <span class="cv-item-title">Turkish Hate Speech Dataset</span>
+        <span class="cv-item-date">2022</span>
       </div>
-      <div class="cv-item-sub">SAIL Lab, Virginia Tech</div>
+      <div class="cv-item-sub">Annotated Turkish tweets for hate speech detection, released with benchmark classifiers</div>
+      <div class="cv-item-detail">Released with <a href="https://aclanthology.org/2022.lrec-1.443.pdf" target="_blank" rel="noopener noreferrer">A Turkish Hate Speech Dataset and Detection System</a> (LREC 2022)</div>
     </div>
   </div>
 
   <div class="cv-section">
-    <div class="cv-section-title">Selected Talks</div>
+    <h2 class="cv-section-title">Invited Talks</h2>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">VTCAR Biennial Spring Autism Conference</span>
+        <span class="cv-item-title">Designing Neuro-Affirming Human–AI Interactions for Coping with Negative Self-Talk</span>
         <span class="cv-item-date">Mar 2025</span>
       </div>
-      <div class="cv-item-detail">Designing Neuro-Affirming Human-AI Interactions for Coping with Negative Self-Talk in Autistic Adults</div>
+      <div class="cv-item-sub">Virginia Tech Center for Autism Research, Biennial Spring Autism Conference</div>
     </div>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">CHCI Seminar, Virginia Tech</span>
+        <span class="cv-item-title">Designing Multimodal AI Tools to Support Autistic Adults with Negative Self-Talk</span>
         <span class="cv-item-date">Feb 2025</span>
       </div>
-      <div class="cv-item-detail">Designing Multimodal AI Tools to Support Autistic Adults with Negative Self-Talk</div>
+      <div class="cv-item-sub">Virginia Tech Center for Human-Computer Interaction (CHCI) Seminar</div>
     </div>
     <div class="cv-item">
       <div class="cv-item-header">
-        <span class="cv-item-title">Symposium on the Human-Centered Future of Work, Virginia Tech</span>
+        <span class="cv-item-title">Supporting Mental Health in Neurodiverse Communities: Multimodal Human–AI Interaction</span>
         <span class="cv-item-date">Nov 2023</span>
       </div>
-      <div class="cv-item-detail">Supporting Mental Health in Neurodiverse Communities: Enhancing LLM Accessibility through Multimodal Human-AI Interactions</div>
+      <div class="cv-item-sub">Symposium on the Human-Centered Future of Work, Virginia Tech</div>
     </div>
   </div>
 
-  <p style="font-size: 13px; color: var(--text3); margin-top: 8px;">
-    If you're autistic and want to talk about research, AI tools, or anything related to my work — please reach out. I'm always happy to connect.
-  </p>
+  <div class="cv-section">
+    <h2 class="cv-section-title">Teaching Experience</h2>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Guest Lecturer, Virginia Tech</span>
+      </div>
+      <div class="cv-item-header"><span class="cv-item-sub">Human-Computer Interaction Capstone</span><span class="cv-item-date">Spring 2026</span></div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Graduate Teaching Assistant, Virginia Tech</span>
+      </div>
+      <div class="cv-item-header"><span class="cv-item-sub">Information Visualization</span><span class="cv-item-date">Fall 2026</span></div>
+      <div class="cv-item-header"><span class="cv-item-sub">Introduction to Programming in Python</span><span class="cv-item-date">Spring 2025</span></div>
+      <div class="cv-item-header"><span class="cv-item-sub">Introduction to Software Design</span><span class="cv-item-date">Fall 2024</span></div>
+      <div class="cv-item-header"><span class="cv-item-sub">Introduction to Problem Solving in Computer Science</span><span class="cv-item-date">Fall 2023</span></div>
+      <div class="cv-item-header"><span class="cv-item-sub">Object-Oriented Programming with Java</span><span class="cv-item-date">Summer 2023</span></div>
+      <div class="cv-item-header"><span class="cv-item-sub">Advanced Machine Learning</span><span class="cv-item-date">Spring 2023</span></div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Graduate Teaching Assistant, Sabancı University</span>
+      </div>
+      <div class="cv-item-header"><span class="cv-item-sub">Computational Approaches to Problem Solving</span><span class="cv-item-date">Fall 2021 – Spring 2022</span></div>
+      <div class="cv-item-header"><span class="cv-item-sub">Natural Language Processing</span><span class="cv-item-date">Spring 2022</span></div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Head Teaching Assistant, Sabancı University</span>
+      </div>
+      <div class="cv-item-header"><span class="cv-item-sub">Machine Learning</span><span class="cv-item-date">Fall 2020 – Spring 2021</span></div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Undergraduate Learning Assistant, Sabancı University</span>
+      </div>
+      <div class="cv-item-header"><span class="cv-item-sub">Operating Systems</span><span class="cv-item-date">Fall 2019</span></div>
+    </div>
+  </div>
+
+  <div class="cv-section">
+    <h2 class="cv-section-title">Academic Service</h2>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Conference Reviewer</span>
+        <span class="cv-item-date">2024 – present</span>
+      </div>
+      <div class="cv-item-detail">CHI 2024, 2026 · CSCW 2024, 2025 · DIS 2026 · GROUP 2025 · EMNLP 2025, 2026</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Journal Reviewer</span>
+        <span class="cv-item-date">2025 – present</span>
+      </div>
+      <div class="cv-item-detail">Computers in Human Behavior Reports</div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Event Coordinator, CHCI Council, Virginia Tech</span>
+        <span class="cv-item-date">2026 – 2027</span>
+      </div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Organizing Committee, Women in Data Science (WiDS) Istanbul</span>
+        <span class="cv-item-date">2021</span>
+      </div>
+    </div>
+    <div class="cv-item">
+      <div class="cv-item-header">
+        <span class="cv-item-title">Training, APA Ethical Emotionally Intelligent AI Pilot Training</span>
+      </div>
+    </div>
+  </div>
+
 
 </div>
 
+<!-- ═══════════════ PERSONAL ═══════════════ -->
+<div class="page" id="page-personal">
+  <h1 class="page-title">Personal</h1>
+  <p class="research-intro personal-intro">Outside of research, I like trying different things to keep myself busy. But as my mom says in Turkish, when it comes to hobbies <em lang="tr">"ayran gönüllüyüm,"</em> which basically means I get excited about new hobbies but can't stick with one for too long. These days, maybe because of the Appalachian influence, I guess, I've been into playing banjo, knitting, and baking.</p>
+  <div class="personal-grid">
+    <section class="hobby-card">
+      <img class="hobby-photo" src="images/personal/banjo.jpg" alt="Buse smiling and holding a banjo in a living room, wearing a striped knit hat." loading="lazy">
+      <h2><span aria-hidden="true">🪕</span> Banjo</h2>
+      <p>I've been playing the banjo for more than a year now! I'll let everyone know when I have my first live performance!</p>
+    </section>
+    <section class="hobby-card">
+      <img class="hobby-photo" src="images/personal/blanket.jpg" alt="Buse holding up a large hand-knit rust-colored blanket with fringe." loading="lazy">
+      <h2><span aria-hidden="true">🧶</span> Knitting</h2>
+      <p>This is something I share with my mom (she's the real pro!). I knitted this blanket last year, and my next projects are a scarf and learning enough crochet to make an Appa plushie!</p>
+    </section>
+    <section class="hobby-card">
+      <div class="hobby-photo-pair">
+        <img class="hobby-photo" src="images/personal/bread.jpg" alt="A freshly baked loaf of sourdough bread on parchment paper." loading="lazy">
+        <img class="hobby-photo" src="images/personal/cake.jpg" alt="A homemade whipped cream cake decorated with strawberries and colorful candles." loading="lazy">
+      </div>
+      <h2><span aria-hidden="true">🍞</span> Baking</h2>
+      <p>I LOVE baking! I've been experimenting with different bread and cake recipes.  I even made this birthday cake! Maybe I'll make my dream of opening a bakery come true one day, who knows?</p>
+    </section>
+    <section class="hobby-card">
+      <h2><span aria-hidden="true">🗾</span> Learning Japanese</h2>
+      <p>I recently started learning Japanese! Because why not? It's always fun to learn a new language.</p>
+    </section>
+    <section class="hobby-card">
+      <h2><span aria-hidden="true">📺</span> Anime</h2>
+      <p>I've been watching more anime lately! So far, I've watched Attack on Titan, Jujutsu Kaisen, Fullmetal Alchemist, and Demon Slayer. Cowboy Bebop is next and I'm always open to recommendations!</p>
+    </section>
+  </div>
+
+</div>
+
+<!-- ═══════════════ ACCESSIBILITY STATEMENT ═══════════════ -->
+<div class="page" id="page-accessibility">
+  <h1 class="page-title">Accessibility statement</h1>
+  <div class="statement">
+    <p>I want this site to work for everyone, including people who use screen readers, keyboards, voice control, or magnification, and people who need different colors, fonts, or spacing. I aim to meet the Web Content Accessibility Guidelines (WCAG) 2.2, level AA.</p>
+
+    <h2>What you can change</h2>
+    <p>Open <strong>Accessibility</strong> in the top menu to find these settings. Your choices are saved in your browser only.</p>
+    <ul>
+      <li>OpenDyslexic font</li>
+      <li>High contrast (also turned on automatically if your device asks for more contrast)</li>
+      <li>Text size: default, large, or larger</li>
+      <li>More space between lines, words, and letters</li>
+      <li>Narrower lines of text</li>
+      <li>A simplified, calmer layout without tinted backgrounds or hover effects</li>
+      <li>Reduced motion (on by default)</li>
+      <li>Light, dark, or system color theme</li>
+    </ul>
+
+    <h2>Other support</h2>
+    <ul>
+      <li>A "Skip to main content" link, full keyboard navigation, and visible focus outlines</li>
+      <li>Each page has its own web address, so the Back button and shared links work</li>
+      <li>Text descriptions for images and figures</li>
+      <li>Support for Windows High Contrast and other forced-colors modes</li>
+    </ul>
+
+    <h2>Known limitations</h2>
+    <ul>
+      <li>The CV in PDF form is not yet a tagged (screen-reader-ready) PDF. The same content is on the CV page as text.</li>
+      <li>Some paper links lead to publisher websites that I do not control.</li>
+      <li>I have checked this site with automated tools and by keyboard. I have not yet completed a full screen-reader review.</li>
+    </ul>
+
+    <h2>Feedback</h2>
+    <p>If something on this site is hard to use, please tell me at <a href="mailto:buse@vt.edu">buse@vt.edu</a>. I will do my best to fix it quickly.</p>
+    <p class="statement-date">Last reviewed: October 2026</p>
+  </div>
+</div>
+
+</main>
+
 <!-- ═══════════════ FOOTER ═══════════════ -->
 <footer>
-  <span class="footer-text">buse [at] vt [dot] edu</span>
-  <span class="footer-text">Last updated: March 2026 &middot; <a href="https://github.com/buse-carik/buse-carik.github.io" target="_blank" rel="noopener noreferrer">Source</a></span>
+  <span class="footer-text">buse [at] vt [dot] edu &middot; <a href="#accessibility" onclick="showPage('accessibility'); return false;">Accessibility statement</a></span>
+  <span class="footer-text">Last updated: October 2026 &middot; <a href="https://github.com/buse-carik/buse-carik.github.io" target="_blank" rel="noopener noreferrer">Source</a></span>
 </footer>
 
 <script>
-  function showPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('active');
-    const links = document.querySelectorAll('.nav-link');
-    const map = ['home','publications','cv'];
-    links[map.indexOf(name)]?.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const readingFontToggle = document.getElementById('reading-font-toggle');
+  readingFontToggle.checked = root.dataset.readingFont === 'opendyslexic';
+  readingFontToggle.addEventListener('change', () => {
+    root.dataset.readingFont = readingFontToggle.checked ? 'opendyslexic' : 'default';
+    savePreference('reading-font', root.dataset.readingFont);
+  });
+  const contrastToggle = document.getElementById('contrast-toggle');
+  contrastToggle.checked = root.dataset.contrast === 'high';
+  contrastToggle.addEventListener('change', () => {
+    root.dataset.contrast = contrastToggle.checked ? 'high' : 'default';
+    savePreference('high-contrast', String(contrastToggle.checked));
+  });
+  const motionToggle = document.getElementById('motion-toggle');
+  motionToggle.checked = root.dataset.motion === 'reduce';
+  motionToggle.addEventListener('change', () => {
+    root.dataset.motion = motionToggle.checked ? 'reduce' : 'system';
+    savePreference('reduce-motion', String(motionToggle.checked));
+  });
+  const themeSelect = document.getElementById('theme-select');
+  themeSelect.value = themePreference;
+  themeSelect.addEventListener('change', () => {
+    themePreference = themeSelect.value;
+    savePreference('color-theme', themePreference);
+    applyTheme();
+  });
+  document.getElementById('reset-preferences').addEventListener('click', () => {
+    root.dataset.readingFont = 'default';
+    root.dataset.contrast = 'default';
+    root.dataset.motion = 'reduce';
+    root.dataset.textSize = 'default';
+    root.dataset.spacing = 'default';
+    root.dataset.width = 'default';
+    root.dataset.calm = 'default';
+    textSizeSelect.value = 'default';
+    spacingToggle.checked = false;
+    widthToggle.checked = false;
+    calmToggle.checked = false;
+    themePreference = 'system';
+    readingFontToggle.checked = false;
+    contrastToggle.checked = false;
+    motionToggle.checked = true;
+    themeSelect.value = 'system';
+    applyTheme();
+    for (const [key, value] of Object.entries({
+      'reading-font': 'default', 'high-contrast': 'false',
+      'reduce-motion': 'true', 'color-theme': 'system',
+      'text-size': 'default', 'text-spacing': 'false', 'narrow-width': 'false', 'calm-mode': 'false'
+    })) savePreference(key, value);
+    document.getElementById('reset-status').textContent = 'Accessibility preferences reset to defaults.';
+  });
+  // Remove stale confirmation when another preference changes.
+  document.querySelector('.accessibility-panel').addEventListener('change', () => {
+    document.getElementById('reset-status').textContent = '';
+  });
+  const textSizeSelect = document.getElementById('text-size-select');
+  textSizeSelect.value = root.dataset.textSize;
+  textSizeSelect.addEventListener('change', () => {
+    root.dataset.textSize = textSizeSelect.value;
+    savePreference('text-size', textSizeSelect.value);
+  });
+  const spacingToggle = document.getElementById('spacing-toggle');
+  spacingToggle.checked = root.dataset.spacing === 'wide';
+  spacingToggle.addEventListener('change', () => {
+    root.dataset.spacing = spacingToggle.checked ? 'wide' : 'default';
+    savePreference('text-spacing', String(spacingToggle.checked));
+  });
+  const widthToggle = document.getElementById('width-toggle');
+  widthToggle.checked = root.dataset.width === 'narrow';
+  widthToggle.addEventListener('change', () => {
+    root.dataset.width = widthToggle.checked ? 'narrow' : 'default';
+    savePreference('narrow-width', String(widthToggle.checked));
+  });
+  const calmToggle = document.getElementById('calm-toggle');
+  calmToggle.checked = root.dataset.calm === 'on';
+  calmToggle.addEventListener('change', () => {
+    root.dataset.calm = calmToggle.checked ? 'on' : 'default';
+    savePreference('calm-mode', String(calmToggle.checked));
+  });
+  const accessibilityMenu = document.getElementById('accessibility-menu');
+  accessibilityMenu.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      accessibilityMenu.open = false;
+      accessibilityMenu.querySelector('summary').focus();
+    }
+  });
+  document.querySelector('.skip-link').addEventListener('click', event => {
+    event.preventDefault();
+    document.getElementById('main-content').focus();
+  });
+  const PAGES = ['home', 'research', 'publications', 'cv', 'personal', 'accessibility'];
+  function pageFromHash() {
+    const name = decodeURIComponent(location.hash.slice(1));
+    return PAGES.includes(name) ? name : 'home';
   }
-
-  function toggleTheme() {
-    const html = document.documentElement;
-    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+  function showPage(name, options = {}) {
+    if (!PAGES.includes(name)) return;
+    // Keep the address bar in sync so Back, Forward, and shared links work.
+    const target = '#' + name;
+    if (!options.fromHistory && location.hash !== target && !(name === 'home' && !location.hash)) {
+      history.pushState(null, '', target);
+    }
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    const page = document.getElementById('page-' + name);
+    page.classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const active = link.dataset.page === name;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    accessibilityMenu.open = false;
+    const heading = page.querySelector('h1');
+    document.title = (name === 'home' ? '' : heading.textContent + ' | ') + 'Buse Çarık';
+    if (options.initial) return;
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+    const reduceMotion = root.dataset.motion === 'reduce' || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
   }
-
-  // Respect system preference on load
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.documentElement.setAttribute('data-theme', 'dark');
+  function syncToHash() {
+    const name = pageFromHash();
+    if (!document.getElementById('page-' + name).classList.contains('active')) showPage(name, { fromHistory: true });
   }
+  window.addEventListener('popstate', syncToHash);
+  window.addEventListener('hashchange', syncToHash);
+  if (pageFromHash() !== 'home') showPage(pageFromHash(), { fromHistory: true, initial: true });
 </script>
 </body>
 </html>
